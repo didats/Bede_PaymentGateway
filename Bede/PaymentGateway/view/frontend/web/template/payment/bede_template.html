@@ -1,0 +1,30 @@
+<div class="payment-method _active">
+    <div class="payment-method-title">
+        <input type="radio" name="payment[method]" class="radio" data-bind="
+                  attr: {'id': getCode()},
+                  value: getCode(),
+                  checked: isChecked,
+                  click: selectPaymentMethod" />
+        <label data-bind="attr: {'for': getCode()}">
+            <span data-bind="text: getTitle()"></span>
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <div class="available-methods" data-bind="visible: availableMethods.length > 0">
+            <h3>Available Payment Options</h3>
+            <ul data-bind="foreach: availableMethods">
+                <li>
+                    <input type="radio" name="payment[bede_method]"
+                        data-bind="attr: {id: 'method_' + $index(), value: code}" />
+                    <label data-bind="attr: {for: 'method_' + $index()}">
+                        <span data-bind="text: title"></span>
+                        <!-- ko if: logo -->
+                        <img data-bind="attr: {src: logo}" width="50" />
+                        <!-- /ko -->
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

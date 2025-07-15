@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<type name="Bede\PaymentGateway\Model\PaymentMethod">
+    <arguments>
+        <argument name="methodList" xsi:type="object">Bede\PaymentGateway\Model\Payment\MethodList</argument>
+    </arguments>
+</type>
+<type name="Magento\Framework\Config\FileIteratorFactory">
+    <arguments>
+        <argument name="excludePatterns" xsi:type="array">
+            <item name="pub" xsi:type="string">/pub/</item>
+        </argument>
+    </arguments>
+</type>
+<type name="Magento\Payment\Api\PaymentMethodListInterface">
+    <plugin name="debug_payment_availability" type="Bede\PaymentGateway\Plugin\DebugPaymentAvailability"/>
+</type>
+</config>

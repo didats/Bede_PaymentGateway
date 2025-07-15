@@ -1,0 +1,343 @@
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
+Array
+(
+    [method_code] => bede_payment
+    [parent_result] => 1
+    [quote_id] => 12
+    [store_id] => 1
+)
