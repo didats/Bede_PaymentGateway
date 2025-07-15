@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <!-- Main Bede Payment menu (under Stores) -->
+        <add 
+            id="Bede_PaymentGateway::bede_payment" 
+            title="Bede Payment" 
+            module="Bede_PaymentGateway" 
+            sortOrder="30" 
+            parent="Magento_Backend::stores" 
+            resource="Bede_PaymentGateway::bede_payment"
+        />
+
+        <add 
+            id="Bede_PaymentGateway::connection" 
+            title="Connection Settings" 
+            module="Bede_PaymentGateway" 
+            sortOrder="10" 
+            parent="Bede_PaymentGateway::bede_payment" 
+            action="adminhtml/system_config/edit/section/bede_payment_connection" 
+            resource="Bede_PaymentGateway::connection"
+        />
+        
+        <!-- Logs Submenu -->
+        <add 
+            id="Bede_PaymentGateway::logs" 
+            title="Logs" 
+            module="Bede_PaymentGateway" 
+            sortOrder="10" 
+            parent="Bede_PaymentGateway::bede_payment" 
+            action="Bede_PaymentGateway/logs/index" 
+            resource="Bede_PaymentGateway::logs"
+        />
+        
+        <!-- Refund Submenu -->
+        <add 
+            id="Bede_PaymentGateway::refund" 
+            title="Refund" 
+            module="Bede_PaymentGateway" 
+            sortOrder="20" 
+            parent="Bede_PaymentGateway::bede_payment" 
+            action="Bede_PaymentGateway/refund/index" 
+            resource="Bede_PaymentGateway::refund"
+        />
+    </menu>
+</config>

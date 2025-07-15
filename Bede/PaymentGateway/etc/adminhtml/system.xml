@@ -15,5 +15,97 @@
                     </field>
                 </group>
         </section>
+
+        <section id="bede_payment_connection" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Connection Settings</label>
+            <tab>bede_payment</tab>
+            <resource>Bede_PaymentGateway::config</resource>
+            
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                
+                <field id="environment" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Environment</label>
+                    <source_model>Bede\PaymentGateway\Model\Config\Source\Environment</source_model>
+                    <comment>Select the environment for Bede Payment</comment>
+                </field>
+            </group>
+            
+            <group id="live_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Live Environment Settings</label>
+                <depends>
+                    <field id="bede_payment_connection/general/environment">live</field>
+                </depends>
+                
+                <field id="base_url" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                
+                <field id="merchant_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant ID</label>
+                    <validate>required-entry</validate>
+                </field>
+                
+                <field id="secret_key" translate="label" type="password" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Secret Key</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                
+                <field id="success_url" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Success URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                
+                <field id="failure_url" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Failure URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                
+                <field id="submerchant_uid" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Submerchant UID</label>
+                    <validate>required-entry</validate>
+                </field>
+            </group>
+            
+            <group id="test_settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Test Environment Settings</label>
+                <depends>
+                    <field id="bede_payment_connection/general/environment">test</field>
+                </depends>
+                
+                <field id="base_url" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                
+                <field id="merchant_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant ID</label>
+                    <validate>required-entry</validate>
+                </field>
+                
+                <field id="secret_key" translate="label" type="password" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Secret Key</label>
+                    <validate>required-entry</validate>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                
+                <field id="success_url" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Success URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                
+                <field id="failure_url" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Failure URL</label>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                
+                <field id="submerchant_uid" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Submerchant UID</label>
+                    <validate>required-entry</validate>
+                </field>
+            </group>
+        </section>
     </system>
 </config>

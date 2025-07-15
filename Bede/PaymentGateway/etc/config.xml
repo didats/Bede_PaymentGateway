@@ -10,5 +10,10 @@
                 <order_status>pending_payment</order_status><!-- set default order status-->
             </bede_payment>
         </payment>
+        <bede_payment_connection>
+            <general>
+                <environment>test</environment>
+            </general>
+        </bede_payment_connection>
     </default>
 </config>

@@ -5,7 +5,7 @@
             <resource id="Magento_Backend::admin">
                 <resource id="Magento_Backend::stores">
                     <resource id="Bede_PaymentGateway::bede_payment" title="Bede Payment" sortOrder="30">
-                        <resource id="Bede_PaymentGateway::connection" title="Connection Settings" sortOrder="10"/>
+                         <resource id="Bede_PaymentGateway::connection" title="Connection Settings" sortOrder="10"/>
                         <resource id="Bede_PaymentGateway::logs" title="Logs" sortOrder="10"/>
                         <resource id="Bede_PaymentGateway::refund" title="Refund" sortOrder="20"/>
                     </resource>
