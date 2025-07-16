@@ -1,28 +1,128 @@
-.bede-payment-options {
-    margin: 15px 0;
+.available-methods ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 0;
+            padding: 0;
+        }
 
-    .bede-methods-list {
-        list-style: none;
-        padding: 0;
+        /* Individual list item styling */
+        .available-methods ul li {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background-color: white;
+            padding: 15px;
+            min-width: 180px;
+            max-width: 220px;
+            flex: 0 1 auto;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-        .bede-method-item {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        /* Hover effects */
+        .available-methods ul li:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+            transform: translateY(-2px);
+        }
 
-            label {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                cursor: pointer;
+        /* Selected state */
+        .available-methods ul li:has(input[type="radio"]:checked) {
+            border-color: #007bff;
+            background-color: #f8f9ff;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Hide the default radio button */
+        .available-methods ul input[type="radio"] {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* Style the label */
+        .available-methods ul label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            cursor: pointer;
+            padding-left: 30px; /* Space for radio button */
+            min-height: 50px;
+        }
+
+        /* Text styling */
+        .available-methods ul label span {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        /* Image styling - float to the right */
+        .available-methods ul label img {
+            width: 50px;
+            height: auto;
+            max-height: 40px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .available-methods ul {
+                flex-direction: column;
             }
-
-            .description {
-                margin: 5px 0 0 25px;
-                color: #666;
-                font-size: 0.9em;
+            
+            .available-methods ul li {
+                max-width: 100%;
+                min-width: 100%;
             }
         }
-    }
-}
+
+        /* Custom radio button styling (optional enhancement) */
+        .available-methods ul input[type="radio"] {
+            appearance: none;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        .available-methods ul input[type="radio"]:checked {
+            border-color: #007bff;
+            background-color: #007bff;
+            position: relative;
+        }
+
+        .available-methods ul input[type="radio"]:checked::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        /* Focus styles for accessibility */
+        .available-methods ul input[type="radio"]:focus {
+            outline: 2px solid #007bff;
+            outline-offset: 2px;
+        }
+
+        .available-methods ul li:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
