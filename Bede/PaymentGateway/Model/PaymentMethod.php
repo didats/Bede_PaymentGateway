@@ -35,6 +35,22 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
             );
         }
 
+        // Get quote from payment info instance
+        $payment = $this->getInfoInstance();
+        $quote = $payment->getQuote();
+
+        if ($quote) {
+            // Total amount
+            $grandTotal = $quote->getGrandTotal();
+
+            // Buyer data
+            $customerEmail = $quote->getCustomerEmail();
+            $billingAddress = $quote->getBillingAddress();
+            $firstName = $billingAddress->getFirstname();
+            $lastName = $billingAddress->getLastname();
+            // ...other fields as needed
+        }
+
         return $this;
     }
 }
