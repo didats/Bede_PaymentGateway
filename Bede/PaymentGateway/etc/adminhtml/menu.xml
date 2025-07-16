@@ -28,7 +28,7 @@
             module="Bede_PaymentGateway" 
             sortOrder="10" 
             parent="Bede_PaymentGateway::bede_payment" 
-            action="Bede_PaymentGateway/logs/index" 
+            action="bedepg/logs/index" 
             resource="Bede_PaymentGateway::logs"
         />
         
