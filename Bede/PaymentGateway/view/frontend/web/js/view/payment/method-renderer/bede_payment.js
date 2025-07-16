@@ -16,12 +16,14 @@ define([
         defaults: {
             template: 'Bede_PaymentGateway/payment/bede_template',
             code: 'bede_payment',
-            selectedMethod: ko.observable(null),
-            availableMethods: ko.observableArray([])
+            selectedMethod: null,
+            availableMethods: []
         },
 
         initialize: function () {
             this._super();
+            this.selectedMethod = ko.observable(null);
+            this.availableMethods = ko.observableArray([]);
             this.loadPaymentMethods();
             return this;
         },
