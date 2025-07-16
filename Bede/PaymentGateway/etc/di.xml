@@ -1,19 +1,34 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-<type name="Bede\PaymentGateway\Model\PaymentMethod">
-    <arguments>
-        <argument name="methodList" xsi:type="object">Bede\PaymentGateway\Model\Payment\MethodList</argument>
-    </arguments>
-</type>
-<type name="Magento\Framework\Config\FileIteratorFactory">
-    <arguments>
-        <argument name="excludePatterns" xsi:type="array">
-            <item name="pub" xsi:type="string">/pub/</item>
-        </argument>
-    </arguments>
-</type>
-<type name="Magento\Payment\Api\PaymentMethodListInterface">
-    <plugin name="debug_payment_availability" type="Bede\PaymentGateway\Plugin\DebugPaymentAvailability"/>
-</type>
+    <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Bede\PaymentGateway\Model\PaymentMethod">
+        <arguments>
+            <argument name="methodList" xsi:type="object">Bede\PaymentGateway\Model\Payment\MethodList</argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Config\FileIteratorFactory">
+        <arguments>
+            <argument name="excludePatterns" xsi:type="array">
+                <item name="pub" xsi:type="string">/pub/</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Payment\Api\PaymentMethodListInterface">
+        <plugin name="debug_payment_availability" type="Bede\PaymentGateway\Plugin\DebugPaymentAvailability"/>
+    </type>
+
+    <virtualType name="Bede\PaymentGateway\Model\ResourceModel\Log\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">bede_payment_logs</argument>
+			<argument name="resourceModel" xsi:type="string">Bede\PaymentGateway\Model\ResourceModel\Log\Collection</argument>
+		</arguments>
+	</virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="bedepg_logs_listing_data_source" xsi:type="string">Bede\PaymentGateway\Model\ResourceModel\Log\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
+
 </config>
