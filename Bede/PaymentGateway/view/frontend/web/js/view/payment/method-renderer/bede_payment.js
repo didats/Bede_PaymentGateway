@@ -49,7 +49,7 @@ define([
 
         loadPaymentMethods: function () {
             var self = this;
-            var serviceUrl = require('mage/url').build('bede_paymentgateway/payment/methods');
+            var serviceUrl = url.build('bede_paymentgateway/payment/methods');
             $.ajax({
                 url: serviceUrl,
                 type: 'GET',
