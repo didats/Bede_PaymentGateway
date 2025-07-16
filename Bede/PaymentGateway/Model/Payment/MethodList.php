@@ -8,10 +8,11 @@ use Bede\PaymentGateway\Model\Payment\Bede;
 class MethodList
 {
     protected $bede;
+    protected $helper;
 
-    public function __construct()
+    public function __construct(Data $helper)
     {
-        $helper = new Data();
+        $this->helper = $helper;
 
         $this->bede = new Bede();
         $this->bede->merchantID = $helper->getMerchantId();
