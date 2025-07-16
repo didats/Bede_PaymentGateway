@@ -14,7 +14,8 @@ class Bede
     public $failureURL;
     public $subMerchantID;
 
-    public $log;
+    public $requestLogger;
+    public $responseLogger;
 
     public function __construct() {}
 
@@ -22,6 +23,16 @@ class Bede
     {
         $code = substr((string)hrtime(true), -8);
         return $code;
+    }
+
+    private function curlCommand($url, $jsonData): string
+    {
+        return <<<CURL
+curl --location '$url' \
+--header 'Content-Type: application/json' \
+--header 'Accept: application/json' \
+--data '$jsonData'
+CURL;
     }
 
     private function exec($path, array $postdata, bool $isPost = true): string
@@ -44,6 +55,7 @@ class Bede
         curl_setopt($curl, CURLOPT_TIMEOUT, 400);
 
         $originalResponse = curl_exec($curl);
+        $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
         $responseLog = "Request:\n";
@@ -52,7 +64,27 @@ class Bede
         $responseLog .= "Response:\n";
         $responseLog .= $originalResponse;
 
-        $this->log = $responseLog;
+        $this->requestLogger = [
+            'type' => 'request',
+            'endpoint' => $path,
+            'method' => ($isPost) ? 'POST' : 'GET',
+            'status' => 200,
+            'order_id' => "-",
+            'transaction_id' => "-",
+            'executed_at' => date('Y-m-d H:i:s'),
+            'curl_command' => $this->curlCommand($url, json_encode($postdata)),
+        ];
+
+        $this->responseLogger = [
+            'type' => 'response',
+            'endpoint' => $path,
+            'method' => ($isPost) ? 'POST' : 'GET',
+            'status' => $statusCode,
+            'order_id' => "-",
+            'transaction_id' => "-",
+            'executed_at' => date('Y-m-d H:i:s'),
+            'curl_command' => $originalResponse,
+        ];
 
 
         return $originalResponse;
@@ -170,11 +202,11 @@ class Bede
         ]);
 
         $json = json_decode($response, true);
-        $mapped = array_map(function($item) {
+        $mapped = array_map(function ($item) {
             return [
                 'code' => $item['PM_CD'],
                 'title' => $item['PM_Name'],
-                'logo' => "https://magento2.awanesia.my.id/".strtolower($item['PM_CD']).".png"
+                'logo' => "https://magento2.awanesia.my.id/" . strtolower($item['PM_CD']) . ".png"
             ];
         }, $json['PayOptions']);
 
