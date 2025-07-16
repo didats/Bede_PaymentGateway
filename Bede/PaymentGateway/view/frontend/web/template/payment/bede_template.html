@@ -11,6 +11,17 @@
     </div>
 
     <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+        </div>
+
+        <!-- ko if: availableMethods().length === 0 -->
+        <div class="message notice">
+            <span data-bind="i18n: 'No payment options available'"></span>
+        </div>
+        <!-- /ko -->
         <div class="available-methods" data-bind="visible: availableMethods.length > 0">
             <h3>Available Payment Options</h3>
             <ul data-bind="foreach: availableMethods">
@@ -25,6 +36,19 @@
                     </label>
                 </li>
             </ul>
+        </div>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout" type="submit" data-bind="
+                        click: placeOrder,
+                        attr: {title: $t('Place Order')},
+                        css: {disabled: !isPlaceOrderActionAllowed()},
+                        enable: (getCode() == isChecked())
+                        " disabled>
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
