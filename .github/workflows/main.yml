@@ -16,4 +16,4 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y sshpass
 
       - name: Execute remote deployment
-        run: sshpass -p '${{ secrets.SSH_PASS }}' ssh -tt -oStrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd /var/www/magento2/app/code; git pull origin main; /usr/bin/bash ./process.sh'
+        run: sshpass -p '${{ secrets.SSH_PASS }}' ssh -tt -oStrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd /var/www/magento2/app/code; git pull origin main;'
