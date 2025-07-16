@@ -1,128 +1,53 @@
-.available-methods ul {
-            list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 0;
-            padding: 0;
+.available-methods {
+    margin-top: 20px;
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    li {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 2px solid #e3e3e3;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        position: relative;
+        cursor: pointer;
+
+        // Highlight when selected
+        &.selected,
+        input[type="radio"]:checked + label {
+            border-color: #1976d2;
+            box-shadow: 0 4px 16px rgba(25,118,210,0.10);
         }
 
-        /* Individual list item styling */
-        .available-methods ul li {
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            background-color: white;
-            padding: 15px;
-            min-width: 180px;
-            max-width: 220px;
-            flex: 0 1 auto;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Hover effects */
-        .available-methods ul li:hover {
-            border-color: #007bff;
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        /* Selected state */
-        .available-methods ul li:has(input[type="radio"]:checked) {
-            border-color: #007bff;
-            background-color: #f8f9ff;
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
-        }
-
-        /* Hide the default radio button */
-        .available-methods ul input[type="radio"] {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            margin: 0;
-            cursor: pointer;
-            z-index: 2;
-        }
-
-        /* Style the label */
-        .available-methods ul label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            cursor: pointer;
-            padding-left: 30px; /* Space for radio button */
-            min-height: 50px;
-        }
-
-        /* Text styling */
-        .available-methods ul label span {
-            font-weight: 500;
-            font-size: 14px;
-            color: #333;
-            flex: 1;
-            margin-right: 10px;
-        }
-
-        /* Image styling - float to the right */
-        .available-methods ul label img {
-            width: 50px;
-            height: auto;
-            max-height: 40px;
-            object-fit: contain;
+        input[type="radio"] {
+            margin-right: 16px;
+            accent-color: #1976d2;
+            width: 20px;
+            height: 20px;
             flex-shrink: 0;
         }
 
-        /* Responsive design */
-        @media (max-width: 600px) {
-            .available-methods ul {
-                flex-direction: column;
-            }
-            
-            .available-methods ul li {
-                max-width: 100%;
-                min-width: 100%;
-            }
+        label {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+            cursor: pointer;
         }
 
-        /* Custom radio button styling (optional enhancement) */
-        .available-methods ul input[type="radio"] {
-            appearance: none;
-            border: 2px solid #ddd;
-            border-radius: 50%;
-            background-color: white;
+        img {
+            margin-left: auto;
+            width: 50px;
+            height: 50px;
+            display: block;
         }
-
-        .available-methods ul input[type="radio"]:checked {
-            border-color: #007bff;
-            background-color: #007bff;
-            position: relative;
-        }
-
-        .available-methods ul input[type="radio"]:checked::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: white;
-        }
-
-        /* Focus styles for accessibility */
-        .available-methods ul input[type="radio"]:focus {
-            outline: 2px solid #007bff;
-            outline-offset: 2px;
-        }
-
-        .available-methods ul li:focus-within {
-            border-color: #007bff;
-            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
-        }
+    }
+}
