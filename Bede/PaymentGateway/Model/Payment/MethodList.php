@@ -20,6 +20,13 @@ class MethodList
         $this->bede->successURL = $helper->getSuccessUrl();
         $this->bede->failureURL = $helper->getFailureUrl();
         $this->bede->subMerchantID = $helper->getSubmerchantUid();
+
+        if ((string)$this->bede->merchantID == "") {
+            $this->bede->merchantID = "Mer2000012";
+        }
+        if ((string)$this->bede->merchantID == "") {
+            $this->bede->merchantID = "1234567";
+        }
     }
 
     public function getAvailableMethods()
