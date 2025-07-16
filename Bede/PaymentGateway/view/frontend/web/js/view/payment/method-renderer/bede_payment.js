@@ -9,7 +9,18 @@ define([
     'Magento_Customer/js/model/customer',
     'Magento_Checkout/js/model/full-screen-loader',
     'ko'
-], function ($, Component, urlBuilder, quote, storage, customer, fullScreenLoader, ko) {
+], function (
+    $,
+    Component,
+    selectPaymentMethodAction,
+    urlBuilder,
+    checkoutData,
+    url,
+    quote,
+    customer,
+    fullScreenLoader,
+    ko
+) {
     'use strict';
 
     return Component.extend({
