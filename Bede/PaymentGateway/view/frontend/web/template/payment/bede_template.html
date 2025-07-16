@@ -22,9 +22,9 @@
             <span data-bind="i18n: 'No payment options available'"></span>
         </div>
         <!-- /ko -->
-        <div class="available-methods" data-bind="visible: availableMethods.length > 0">
+        <div class="available-methods" data-bind="visible: availableMethods().length > 0">
             <h3>Available Payment Options</h3>
-            <ul data-bind="foreach: availableMethods">
+            <ul data-bind="foreach: availableMethods()">
                 <li>
                     <input type="radio" name="payment[bede_method]"
                         data-bind="attr: {id: 'method_' + $index(), value: code}" />
