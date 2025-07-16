@@ -7,16 +7,17 @@ define([
     'mage/url',
     'Magento_Checkout/js/model/quote',
     'Magento_Customer/js/model/customer',
-    'Magento_Checkout/js/model/full-screen-loader'
-], function ($, Component, urlBuilder, quote, storage, customer, fullScreenLoader) {
+    'Magento_Checkout/js/model/full-screen-loader',
+    'ko'
+], function ($, Component, urlBuilder, quote, storage, customer, fullScreenLoader, ko) {
     'use strict';
 
     return Component.extend({
         defaults: {
             template: 'Bede_PaymentGateway/payment/bede_template',
             code: 'bede_payment',
-            selectedMethod: null,
-            availableMethods: []
+            selectedMethod: ko.observable(null),
+            availableMethods: ko.observableArray([])
         },
 
         initialize: function () {
@@ -39,6 +40,7 @@ define([
             $.ajax({
                 url: serviceUrl,
                 type: 'GET',
+                dataType: 'json',
                 data: {
                     cartId: quote.quoteId
                 }
