@@ -53,7 +53,6 @@
                 
                 <field id="submerchant_uid" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Submerchant UID</label>
-                    <validate>required-entry</validate>
                 </field>
             </group>
             
@@ -91,7 +90,6 @@
                 
                 <field id="submerchant_uid" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Submerchant UID</label>
-                    <validate>required-entry</validate>
                 </field>
             </group>
         </section>
