@@ -47,6 +47,8 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
             $customAttributeFactory,
             $paymentData,
             $scopeConfig,
+            $resource,
+            $resourceCollection,
             $logger,
             $data
         );
