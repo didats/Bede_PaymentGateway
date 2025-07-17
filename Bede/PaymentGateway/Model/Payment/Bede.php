@@ -242,7 +242,7 @@ CURL;
                 'ApiVer' => '0.61',
                 'IPAddrs' => $this->IPAddress(),
                 'Country' => 'Kuwait',
-                'APPID' => 'WooCommerce_',
+                'APPID' => 'Magento_',
                 'MdlID' => 'Bede_Payment_Extension',
                 'DevcType' => 'SYSTEM',
                 'OS' => $this->osInfo()
