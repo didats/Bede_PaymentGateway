@@ -22,12 +22,33 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_isOffline = false;
     protected $_canAuthorize = true;
     protected $_canCapture = true;
-    protected $logFactory;
-    protected $bede;
-    protected $buyer;
 
-    public function __construct(Data $helper, Bede $bede, LogFactory $logFactory, BedeBuyer $buyer)
-    {
+    public function __construct(
+        Data $helper,
+        Bede $bede,
+        LogFactory $logFactory,
+        BedeBuyer $buyer,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
+        \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+        \Magento\Payment\Helper\Data $paymentData,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Payment\Model\Method\Logger $logger,
+        array $data = []
+    ) {
+
+        parent::__construct(
+            $context,
+            $registry,
+            $extensionFactory,
+            $customAttributeFactory,
+            $paymentData,
+            $scopeConfig,
+            $logger,
+            $data
+        );
+
         $this->logFactory = $logFactory;
         $this->bede = $bede;
         $this->buyer = $buyer;

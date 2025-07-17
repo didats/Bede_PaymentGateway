@@ -1,4 +1,5 @@
 <?php
+
 namespace Bede\PaymentGateway\Controller\Payment;
 
 use Magento\Framework\App\Action\Action;
@@ -10,7 +11,7 @@ class Methods extends Action
 {
     protected $resultJsonFactory;
     protected $methodList;
-    
+
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
@@ -20,11 +21,11 @@ class Methods extends Action
         $this->resultJsonFactory = $resultJsonFactory;
         $this->methodList = $methodList;
     }
-    
+
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
-        
+
         try {
             $methods = $this->methodList->getAvailableMethods();
             return $result->setData([
