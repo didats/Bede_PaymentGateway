@@ -73,8 +73,6 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
         \Magento\Payment\Helper\Data $paymentData,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         \Magento\Payment\Model\Method\Logger $logger = null,
         array $data = []
     ) {
@@ -85,8 +83,6 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
             $customAttributeFactory,
             $paymentData,
             $scopeConfig,
-            $resource,
-            $resourceCollection,
             $logger,
             $data
         );
