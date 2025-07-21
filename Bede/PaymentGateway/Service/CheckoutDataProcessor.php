@@ -40,6 +40,9 @@ class CheckoutDataProcessor
         $lastName = $billingAddress->getLastname();
         $countryCode = $billingAddress->getCountryId();
 
+        $addressDataArray = $billingAddress->getData();
+        $addressDataString = json_encode($addressDataArray); // JSON string
+
         $this->bede->merchantID = $this->helper->getMerchantId();
         $this->bede->secretKey = $this->helper->getSecretKey();
         $this->bede->successURL = $this->helper->getSuccessUrl();
@@ -48,10 +51,11 @@ class CheckoutDataProcessor
 
         $this->buyer->amount = $grandTotal;
         $this->buyer->email = $customerEmail;
+        $this->buyer->phoneNumber = $billingAddress->getTelephone();
         $this->buyer->name = $firstName . " " . $lastName;
         $this->buyer->countryCode = $this->buyer->countryDialCode($countryCode);
-        $this->buyer->customerData1 = $customerEmail;
-        $this->buyer->customerData2 = $billingAddress;
+        $this->buyer->customerData1 = (string)$customerEmail;
+        $this->buyer->customerData2 = $addressDataString;
         $this->buyer->orderID = $quote->getId();
 
         // Call API, log, etc.
