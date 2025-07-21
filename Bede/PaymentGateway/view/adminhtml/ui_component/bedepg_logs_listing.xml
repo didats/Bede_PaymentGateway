@@ -59,9 +59,18 @@
 				<indexField>id</indexField>
 			</settings>
 		</selectionsColumn>
+		<column name="id">
+			<settings>
+				<dataType>text</dataType>
+				<filter>text</filter>
+				<sorting>desc</sorting>
+				<label translate="true">ID</label>
+			</settings>
+		</column>
 		<column name="type">
 			<settings>
 				<dataType>text</dataType>
+				<filter>text</filter>
 				<label translate="true">Type</label>
 			</settings>
 		</column>
