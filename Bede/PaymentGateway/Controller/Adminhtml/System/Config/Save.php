@@ -41,13 +41,13 @@ class Save extends SaveController
     public function execute()
     {
         $params = $this->_request->getParams();
-        if($params['section'] == "bede_payment_connection"){
+        if ($params['section'] == "bede_payment_connection") {
             $enable = $params['groups']['general']['fields']['enabled']['value'];
-            $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode(); 
-            
-            if($enable == 1){
-                if($currencyCode != 'KWD'){
-                    $this->messageManager->addError('Currency must be KWD');
+            $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
+
+            if ($enable == 1) {
+                if ($currencyCode != 'KWD') {
+                    $this->messageManager->addError('Currency must be KWD - ' . $currencyCode);
                     return $this->resultRedirectFactory->create()->setPath('adminhtml/system_config/edit', ['section' => 'bede_payment_connection']);
                 }
             }
