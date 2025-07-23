@@ -41,9 +41,22 @@ class Save extends SaveController
     public function execute()
     {
         $params = $this->_request->getParams();
+        $scope = $this->getRequest()->getParam('scope');
+        $scopeCode = $this->getRequest()->getParam('scope_code');
+
         if ($params['section'] == "bede_payment_connection") {
             $enable = $params['groups']['general']['fields']['enabled']['value'];
-            $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
+
+            if ($scope === 'websites' && $scopeCode) {
+                $website = $this->storeManager->getWebsite($scopeCode);
+                $currencyCode = $website->getDefaultCurrencyCode();
+            } elseif ($scope === 'stores' && $scopeCode) {
+                $store = $this->storeManager->getStore($scopeCode);
+                $currencyCode = $store->getDefaultCurrencyCode();
+            } else {
+                // Default scope
+                $currencyCode = $this->storeManager->getStore()->getDefaultCurrencyCode();
+            }
 
             if ($enable == 1) {
                 if ($currencyCode != 'KWD') {
