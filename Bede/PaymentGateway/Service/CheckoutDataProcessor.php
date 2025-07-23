@@ -68,5 +68,11 @@ class CheckoutDataProcessor
         $responseLog = $this->logFactory->create();
         $responseLog->setData($this->bede->responseLogger);
         $responseLog->save();
+
+        if (isset($response['PayUrl'])) {
+            $payment->setAdditionalInformation('bede_pay_url', $response['PayUrl']);
+        } else {
+            $payment->setAdditionalInformation('bede_pay_error', 'Payment gateway did not return a valid URL.');
+        }
     }
 }

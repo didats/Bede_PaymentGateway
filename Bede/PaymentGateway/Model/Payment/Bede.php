@@ -8,14 +8,18 @@ class Bede
     private $moduleName = "Magento";
 
     public $baseURL = "https://demo.bookeey.com";
-    public $merchantID = "Mer2000012";
-    public $secretKey = "1234567";
+    public $merchantID = "mer2500011";
+    public $secretKey = "7483493";
     public $successURL;
     public $failureURL;
     public $subMerchantID;
 
     public $requestLogger;
     public $responseLogger;
+    public $requestData;
+
+    public $logger;
+    public $rawHashing;
 
     public function __construct() {}
 
@@ -64,6 +68,11 @@ CURL;
         $responseLog .= "Response:\n";
         $responseLog .= $originalResponse;
 
+        $logger = $url . "\n";
+        $logger .= json_encode($postdata) . "\n";
+        $logger .= $originalResponse;
+        $this->logger = $logger;
+
         $this->requestLogger = [
             'type' => 'request',
             'endpoint' => $path,
@@ -90,7 +99,26 @@ CURL;
         return $originalResponse;
     }
 
-    private function hashing($trackID, $amount): string
+    private function hashing($trackID, $amount, $generateNumber): string
+    {
+        $input = sprintf(
+            '%s|%s|%s|%s|%s|%s|%s|%s',
+            (string)$this->merchantID,
+            (string)$trackID,
+            (string)$this->successURL,
+            (string)$this->failureURL,
+            (string)$amount,
+            'GEN', // crossCat
+            (string)$this->secretKey,
+            (string)$generateNumber
+        );
+
+        $this->rawHashing = $input;
+
+        return hash("sha512", $input);
+    }
+
+    private function rawHashing($trackID, $amount, $generateNumber): string
     {
         $input = sprintf(
             '%s|%s|%s|%s|%s|%s|%s|%s',
@@ -101,9 +129,9 @@ CURL;
             $amount,
             'GEN', // crossCat
             (string)$this->secretKey,
-            (string)$trackID
+            (string)$generateNumber
         );
-        return hash("sha512", $input);
+        return $input;
     }
 
     private function IPAddress()
@@ -233,7 +261,11 @@ CURL;
     public function requestLink(BedeBuyer $buyer, $paymentMethod = "knet")
     {
         $path = "/pgapi/api/payment/requestLink";
-        $hashMac = $this->hashing($buyer->trackID, $buyer->amount);
+        $generateNumber = $this->generateNumber();
+
+        $hashMac = $this->hashing($buyer->trackID, $buyer->amount, $generateNumber);
+        $rawHash = $this->rawHashing($buyer->trackID, $buyer->amount, $generateNumber);
+
         $postData = [
             'DBRqst' => 'PY_ECom',
             'Do_Appinfo' => array(
@@ -272,12 +304,15 @@ CURL;
             'Do_TxnHdr' => array(
                 'Merch_Txn_UID' => $buyer->trackID,
                 'PayFor' => 'ECom',
-                'PayMethod' => $paymentMethod,
-                'Txn_HDR' => $this->generateNumber(),
+                'PayMethod' => strtolower($paymentMethod),
+                'Txn_HDR' => $generateNumber,
                 'hashMac' => $hashMac,
+                // 'rawHash' => $rawHash,
                 'BKY_Txn_UID' => ''
             )
         ];
+
+        $this->requestData = $postData;
 
         $response = $this->exec($path, $postData);
         return $response;

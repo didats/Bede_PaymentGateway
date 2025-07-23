@@ -76,6 +76,35 @@ define([
                     'selected_submethod': this.selectedMethod()
                 }
             };
+        },
+
+        afterPlaceOrder: function () {
+            var self = this;
+            // Call an endpoint to get the PayUrl or error
+            var serviceUrl = url.build('bede_paymentgateway/payment/result');
+            $.ajax({
+                url: serviceUrl,
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    cartId: quote.quoteId
+                },
+                success: function (response) {
+                    if (response.pay_url) {
+                        // Redirect to payment gateway
+                        window.location.href = response.pay_url;
+                    } else if (response.error) {
+                        // Show error message
+                        alert(response.error);
+                    } else {
+                        // Fallback error
+                        alert('Payment gateway did not return a valid URL.');
+                    }
+                },
+                error: function () {
+                    alert('Could not connect to payment gateway.');
+                }
+            });
         }
     });
 });
