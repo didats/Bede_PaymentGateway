@@ -6,6 +6,9 @@
 		</item>
 	</argument>
 	<settings>
+		<buttons>
+			<button class="Bede\PaymentGateway\Block\Adminhtml\Log\ClearButton" name="clear"/>
+        </buttons>
 		<spinner>bedepg_logs_columns</spinner>
 		<deps>
 			<dep>bedepg_logs_listing.bedepg_logs_listing_data_source</dep>
@@ -36,21 +39,21 @@
 		<filters name="listing_filters"/>
 		<paging name="listing_paging"/>
 		<exportButton class="Magento\Ui\Component\ExportButton" component="Magento_Ui/js/grid/export" displayArea="dataGridActions">
-    <settings>
-        <options>
-            <option name="csv" xsi:type="array">
-                <item name="value" xsi:type="string">csv</item>
-                <item name="label" xsi:type="string" translate="true">CSV</item>
-                <item name="url" xsi:type="string">mui/export/gridToCsv</item>
-            </option>
-            <option name="xml" xsi:type="array">
-                <item name="value" xsi:type="string">xml</item>
-                <item name="label" xsi:type="string" translate="true">Excel XML</item>
-                <item name="url" xsi:type="string">mui/export/gridToXml</item>
-            </option>
-        </options>
-    </settings>
-</exportButton>
+			<settings>
+				<options>
+					<option name="csv" xsi:type="array">
+						<item name="value" xsi:type="string">csv</item>
+						<item name="label" xsi:type="string" translate="true">CSV</item>
+						<item name="url" xsi:type="string">mui/export/gridToCsv</item>
+					</option>
+					<option name="xml" xsi:type="array">
+						<item name="value" xsi:type="string">xml</item>
+						<item name="label" xsi:type="string" translate="true">Excel XML</item>
+						<item name="url" xsi:type="string">mui/export/gridToXml</item>
+					</option>
+				</options>
+			</settings>
+		</exportButton>
 	</listingToolbar>
 	
 	<columns name="bedepg_logs_columns">

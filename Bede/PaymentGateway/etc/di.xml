@@ -31,4 +31,6 @@
 		</arguments>
 	</type>
 
+    <preference for="Magento\Config\Controller\Adminhtml\System\Config\Save" type="Bede\PaymentGateway\Controller\Adminhtml\System\Config\Save" />
+
 </config>
