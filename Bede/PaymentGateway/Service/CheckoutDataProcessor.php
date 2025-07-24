@@ -13,6 +13,7 @@ class CheckoutDataProcessor
     protected $buyer;
     protected $logFactory;
     protected $helper;
+    protected $paymentURL = "";
 
     public function __construct(
         Bede $bede,
@@ -57,6 +58,7 @@ class CheckoutDataProcessor
 
         // Call API, log, etc.
         $response = $this->bede->requestLink($this->buyer, $selectedSubmethod);
+        $responsejson = json_decode($response, true);
 
         $requestLog = $this->logFactory->create();
         $requestLog->setData($this->bede->requestLogger);
@@ -66,10 +68,16 @@ class CheckoutDataProcessor
         $responseLog->setData($this->bede->responseLogger);
         $responseLog->save();
 
-        if (isset($response['PayUrl'])) {
-            $payment->setAdditionalInformation('bede_pay_url', $response['PayUrl']);
+        if (isset($responsejson['PayUrl'])) {
+            $this->paymentURL = $responsejson['PayUrl'];
+            $payment->setAdditionalInformation('bede_pay_url', $responsejson['PayUrl']);
         } else {
             $payment->setAdditionalInformation('bede_pay_error', 'Payment gateway did not return a valid URL.');
         }
+    }
+
+    public function getPayUrl(): string
+    {
+        return $this->paymentURL;
     }
 }

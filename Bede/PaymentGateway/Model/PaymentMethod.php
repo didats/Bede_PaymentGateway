@@ -24,47 +24,6 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
     protected $_canCapture = true;
     protected $checkoutDataProcessor;
 
-    // public function __construct(
-    //     Data $helper,
-    //     Bede $bede,
-    //     LogFactory $logFactory,
-    //     BedeBuyer $buyer,
-    // \Magento\Framework\Model\Context $context,
-    // \Magento\Framework\Registry $registry,
-    // \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
-    // \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
-    // \Magento\Payment\Helper\Data $paymentData,
-    // \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-    // \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-    // \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-    // \Magento\Payment\Model\Method\Logger $logger = null,
-    // array $data = []
-    // ) {
-
-    // parent::__construct(
-    //     $context,
-    //     $registry,
-    //     $extensionFactory,
-    //     $customAttributeFactory,
-    //     $paymentData,
-    //     $scopeConfig,
-    //     $resource,
-    //     $resourceCollection,
-    //     $logger,
-    //     $data
-    // );
-
-    //     $this->logFactory = $logFactory;
-    //     $this->bede = $bede;
-    //     $this->buyer = $buyer;
-
-    //     $this->bede->merchantID = $helper->getMerchantId();
-    //     $this->bede->secretKey = $helper->getSecretKey();
-    //     $this->bede->successURL = $helper->getSuccessUrl();
-    //     $this->bede->failureURL = $helper->getFailureUrl();
-    //     $this->bede->subMerchantID = $helper->getSubmerchantUid();
-    // }
-
     public function __construct(
         \Bede\PaymentGateway\Service\CheckoutDataProcessor $checkoutDataProcessor,
         \Magento\Framework\Model\Context $context,
@@ -111,7 +70,7 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $payment = $this->getInfoInstance();
-        $selectedSubmethod = $payment->getAdditionalInformation('selected_submethod');
+        $selectedSubmethod = $payment->getAdditionalInformation('selected_submethod') ?? "knet";
 
         $this->checkoutDataProcessor->process($payment, $selectedSubmethod);
 

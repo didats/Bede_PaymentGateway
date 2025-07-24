@@ -28,13 +28,15 @@ define([
             template: 'Bede_PaymentGateway/payment/bede_template',
             code: 'bede_payment',
             selectedMethod: null,
-            availableMethods: []
+            availableMethods: [],
+            payUrl: null
         },
 
         initialize: function () {
             this._super();
             this.selectedMethod = ko.observable(null);
             this.availableMethods = ko.observableArray([]);
+            this.payUrl = null;
             this.loadPaymentMethods();
             return this;
         },
@@ -78,33 +80,78 @@ define([
             };
         },
 
-        afterPlaceOrder: function () {
+        /**
+         * Override the default placeOrder method to handle payment processing
+         * before the order is placed
+         */
+        placeOrder: function (data, event) {
             var self = this;
-            // Call an endpoint to get the PayUrl or error
-            var serviceUrl = url.build('bede_paymentgateway/payment/result');
-            $.ajax({
-                url: serviceUrl,
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    cartId: quote.quoteId
-                },
-                success: function (response) {
-                    if (response.pay_url) {
-                        // Redirect to payment gateway
-                        window.location.href = response.pay_url;
-                    } else if (response.error) {
-                        // Show error message
-                        alert(response.error);
-                    } else {
-                        // Fallback error
-                        alert('Payment gateway did not return a valid URL.');
+
+            if (event) {
+                event.preventDefault();
+            }
+
+            if (this.validate() && this.isPlaceOrderActionAllowed() === true) {
+                this.isPlaceOrderActionAllowed(false);
+                fullScreenLoader.startLoader();
+                
+                // Call an endpoint to get the PayUrl or error
+                var serviceUrl = url.build('bede_paymentgateway/payment/getpayurl');
+                var cartId = quote.getQuoteId ? quote.getQuoteId() : quote.quoteId;
+                
+                var component = this;
+
+                // Process the payment first
+                $.ajax({
+                    url: serviceUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        cartId: cartId,
+                        selected_submethod: this.selectedMethod()
+                    },
+                    success: function (response) {
+                        console.log('Payment result response:', response);
+                        fullScreenLoader.stopLoader();
+                        
+                        if (response.pay_url) {
+                            // If we have a payment URL, redirect to it
+                            component.payUrl = response.pay_url;
+                            console.log('Set payUrl:', component.payUrl);
+                            window.location.href = response.pay_url;
+                            Component.prototype.placeOrder.apply(self, [data, event]);
+                        } else if (response.error) {
+                            // Show error message and stay on checkout page
+                            alert(response.error);
+                            self.isPlaceOrderActionAllowed(true);
+                        } else {
+                            // Fallback error
+                            alert('Payment gateway did not return a valid URL.');
+                            self.isPlaceOrderActionAllowed(true);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        fullScreenLoader.stopLoader();
+                        console.log('AJAX error:', status, error, xhr.responseText);
+                        alert('Could not connect to payment gateway.');
+                        self.isPlaceOrderActionAllowed(true);
                     }
-                },
-                error: function () {
-                    alert('Could not connect to payment gateway.');
-                }
-            });
+                });
+                
+                return false;
+            }
+            
+            return false;
+        },
+        
+        /**
+         * Keep the afterPlaceOrder method for compatibility
+         */
+        afterPlaceOrder: function () {
+            console.log('afterPlaceOrder called', this.payUrl);
+            if (this.payUrl) {
+                window.location.href = this.payUrl;
+            }
         }
     });
 });

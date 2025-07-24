@@ -26,7 +26,14 @@ class Result extends Action
     {
         $result = $this->resultJsonFactory->create();
         $order = $this->checkoutSession->getLastRealOrder();
+        if (!$order) {
+            return $result->setData(['error' => 'Order not found in session.']);
+        }
+
         $payment = $order->getPayment();
+        if (!$payment) {
+            return $result->setData(['error' => 'Payment information not found. - ' . json_encode($order)]);
+        }
         $payUrl = $payment->getAdditionalInformation('bede_pay_url');
         $error = $payment->getAdditionalInformation('bede_pay_error');
 
