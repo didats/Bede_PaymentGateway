@@ -6,7 +6,7 @@ class BedeBuyer
 {
     public $name = "";
     public $email = "";
-    public $amount = 1;
+    private $amount = 1;
     public $phoneNumber = "";
     public $countryCode = "965";
     public $orderID = 1;
@@ -24,6 +24,16 @@ class BedeBuyer
     {
         $code = date("YmdHis") . substr((string)hrtime(true), -8);
         return $code;
+    }
+
+    public function amount()
+    {
+        return number_format($this->amount, 0, '.', '');
+    }
+
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
     }
 
     public function countryDialCode($code): string

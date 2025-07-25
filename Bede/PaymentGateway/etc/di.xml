@@ -31,6 +31,12 @@
 		</arguments>
 	</type>
 
+    <type name="Bede\PaymentGateway\Controller\Payment\GetPayUrl">
+        <arguments>
+            <argument name="quoteIdMaskFactory" xsi:type="object">Magento\Quote\Model\QuoteIdMaskFactory</argument>
+        </arguments>
+    </type>
+
     <preference for="Magento\Config\Controller\Adminhtml\System\Config\Save" type="Bede\PaymentGateway\Controller\Adminhtml\System\Config\Save" />
 
 </config>

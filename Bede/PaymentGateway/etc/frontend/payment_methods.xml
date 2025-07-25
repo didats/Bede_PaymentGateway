@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<payment_methods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/payment_methods.xsd">
+    <method name="bede_payment">
+        <renderer>js/view/payment/method-renderer/bede_payment</renderer>
+    </method>
+</payment_methods>

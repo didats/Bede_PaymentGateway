@@ -263,8 +263,8 @@ CURL;
         $path = "/pgapi/api/payment/requestLink";
         $generateNumber = $this->generateNumber();
 
-        $hashMac = $this->hashing($buyer->trackID, number_format($buyer->amount, 0), $generateNumber);
-        $rawHash = $this->rawHashing($buyer->trackID, number_format($buyer->amount, 0), $generateNumber);
+        $hashMac = $this->hashing($buyer->trackID, $buyer->amount(), $generateNumber);
+        $rawHash = $this->rawHashing($buyer->trackID, $buyer->amount(), $generateNumber);
 
         $postData = [
             'DBRqst' => 'PY_ECom',
@@ -298,7 +298,7 @@ CURL;
             'Do_TxnDtl' => array(
                 array(
                     'SubMerchUID' => $this->subMerchantID ?? "",
-                    'Txn_AMT' => (float)$buyer->amount
+                    'Txn_AMT' => (float)$buyer->amount()
                 )
             ),
             'Do_TxnHdr' => array(

@@ -49,7 +49,7 @@ class CheckoutDataProcessor
         $this->bede->failureURL = $this->helper->getFailureUrl();
         $this->bede->subMerchantID = $this->helper->getSubmerchantUid();
 
-        $this->buyer->amount = $grandTotal;
+        $this->buyer->setAmount($grandTotal);
         $this->buyer->email = $customerEmail;
         $this->buyer->phoneNumber = $billingAddress->getTelephone();
         $this->buyer->name = $firstName . " " . $lastName;
