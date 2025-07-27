@@ -21,6 +21,9 @@ class Bede
     public $logger;
     public $rawHashing;
 
+    public $cartID;
+    public $transactionRef;
+
     public function __construct() {}
 
     private function generateNumber(): string
@@ -94,7 +97,8 @@ CURL;
             'executed_at' => date('Y-m-d H:i:s'),
             'curl_command' => $originalResponse,
         ];
-
+        $this->responseLogger['cart_id'] = $this->cartID;
+        $this->responseLogger['transaction_ref'] = $this->transactionRef;
 
         return $originalResponse;
     }
@@ -312,6 +316,7 @@ CURL;
             )
         ];
 
+        $this->transactionRef = $buyer->trackID;
         $this->requestData = $postData;
 
         $response = $this->exec($path, $postData);

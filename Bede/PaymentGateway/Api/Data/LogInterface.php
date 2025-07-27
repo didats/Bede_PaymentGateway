@@ -124,4 +124,6 @@ interface LogInterface
      * @return $this
      */
     public function setCreatedAt($createdAt);
+
+    public function save(LogInterface $log);
 }

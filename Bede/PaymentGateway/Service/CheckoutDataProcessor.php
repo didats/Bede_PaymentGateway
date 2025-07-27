@@ -6,6 +6,9 @@ use Bede\PaymentGateway\Model\Payment\Bede;
 use Bede\PaymentGateway\Model\Payment\BedeBuyer;
 use Bede\PaymentGateway\Model\LogFactory;
 use Bede\PaymentGateway\Helper\Data;
+use Bede\PaymentGateway\Api\LogRepositoryInterface;
+use Bede\PaymentGateway\Model\LogRepository;
+use Magento\Framework\UrlInterface;
 
 class CheckoutDataProcessor
 {
@@ -14,17 +17,23 @@ class CheckoutDataProcessor
     protected $logFactory;
     protected $helper;
     protected $paymentURL = "";
+    protected $urlBuilder;
+    protected $logRepository;
 
     public function __construct(
         Bede $bede,
         BedeBuyer $buyer,
         LogFactory $logFactory,
-        Data $helper
+        LogRepository $logRepository,
+        Data $helper,
+        UrlInterface $urlBuilder
     ) {
         $this->bede = $bede;
         $this->buyer = $buyer;
         $this->logFactory = $logFactory;
         $this->helper = $helper;
+        $this->urlBuilder = $urlBuilder;
+        $this->logRepository = $logRepository;
     }
 
     public function process($payment, $selectedSubmethod)
@@ -43,11 +52,16 @@ class CheckoutDataProcessor
 
         $addressDataArray = $billingAddress->getData();
 
+        //TODO: Failed URL and Success URL
+        $successURL = $this->urlBuilder->getUrl('bede_paymentgateway/payment/response');
+        $failureURL = $this->urlBuilder->getUrl('bede_paymentgateway/payment/response');
+
         $this->bede->merchantID = $this->helper->getMerchantId();
         $this->bede->secretKey = $this->helper->getSecretKey();
-        $this->bede->successURL = $this->helper->getSuccessUrl();
-        $this->bede->failureURL = $this->helper->getFailureUrl();
+        $this->bede->successURL = $successURL;
+        $this->bede->failureURL = $failureURL;
         $this->bede->subMerchantID = $this->helper->getSubmerchantUid();
+        $this->bede->cartID = $quote->getId();
 
         $this->buyer->setAmount($grandTotal);
         $this->buyer->email = $customerEmail;
@@ -62,11 +76,11 @@ class CheckoutDataProcessor
 
         $requestLog = $this->logFactory->create();
         $requestLog->setData($this->bede->requestLogger);
-        $requestLog->save();
+        $this->logRepository->save($requestLog);
 
         $responseLog = $this->logFactory->create();
         $responseLog->setData($this->bede->responseLogger);
-        $responseLog->save();
+        $this->logRepository->save($responseLog);
 
         if (isset($responsejson['PayUrl'])) {
             $this->paymentURL = $responsejson['PayUrl'];

@@ -8,6 +8,8 @@
         <column xsi:type="int" name="status" padding="11" nullable="false" comment="Status"/>
         <column xsi:type="bigint" name="order_id" padding="20" unsigned="true" nullable="true" comment="Order ID"/>
         <column xsi:type="bigint" name="transaction_id" padding="20" unsigned="true" nullable="true" comment="Transaction ID"/>
+        <column xsi:type="bigint" name="cart_id" padding="20" unsigned="true" nullable="true" comment="Cart ID"/>
+        <column xsi:type="varchar" length="255" name="transaction_ref" nullable="true" comment="Transaction Reference"/>
         <column xsi:type="datetime" name="executed_at" nullable="false" comment="Executed At"/>
         <column xsi:type="text" name="curl_command" nullable="true" comment="cURL Command"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
