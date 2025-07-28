@@ -1,8 +1,10 @@
 <?php
+
 /**
  * Copyright ©  All rights reserved.
  * See COPYING.txt for license details.
  */
+
 declare(strict_types=1);
 
 namespace Bede\PaymentGateway\Model;
@@ -10,7 +12,7 @@ namespace Bede\PaymentGateway\Model;
 use Magento\Framework\Model\AbstractModel;
 use Bede\PaymentGateway\Api\Data\LogInterface;
 
-class Log extends AbstractModel implements LogInterface
+class Log extends AbstractModel
 {
 
     /**

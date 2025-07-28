@@ -6,8 +6,6 @@ use Bede\PaymentGateway\Model\Payment\Bede;
 use Bede\PaymentGateway\Model\Payment\BedeBuyer;
 use Bede\PaymentGateway\Model\LogFactory;
 use Bede\PaymentGateway\Helper\Data;
-use Bede\PaymentGateway\Api\LogRepositoryInterface;
-use Bede\PaymentGateway\Model\LogRepository;
 use Magento\Framework\UrlInterface;
 
 class CheckoutDataProcessor
@@ -23,17 +21,13 @@ class CheckoutDataProcessor
     public function __construct(
         Bede $bede,
         BedeBuyer $buyer,
-        LogFactory $logFactory,
-        LogRepository $logRepository,
         Data $helper,
         UrlInterface $urlBuilder
     ) {
         $this->bede = $bede;
         $this->buyer = $buyer;
-        $this->logFactory = $logFactory;
         $this->helper = $helper;
         $this->urlBuilder = $urlBuilder;
-        $this->logRepository = $logRepository;
     }
 
     public function process($payment, $selectedSubmethod)
@@ -74,13 +68,16 @@ class CheckoutDataProcessor
         $response = $this->bede->requestLink($this->buyer, $selectedSubmethod);
         $responsejson = json_decode($response, true);
 
-        $requestLog = $this->logFactory->create();
-        $requestLog->setData($this->bede->requestLogger);
-        $this->logRepository->save($requestLog);
+        $this->saveLogData($this->bede->requestLogger);
+        $this->saveLogData($this->bede->responseLogger);
 
-        $responseLog = $this->logFactory->create();
-        $responseLog->setData($this->bede->responseLogger);
-        $this->logRepository->save($responseLog);
+        // $requestLog = $this->logFactory->create();
+        // $requestLog->setData($this->bede->requestLogger);
+        // $this->logRepository->save($requestLog);
+
+        // $responseLog = $this->logFactory->create();
+        // $responseLog->setData($this->bede->responseLogger);
+        // $this->logRepository->save($responseLog);
 
         if (isset($responsejson['PayUrl'])) {
             $this->paymentURL = $responsejson['PayUrl'];
@@ -88,6 +85,17 @@ class CheckoutDataProcessor
         } else {
             $payment->setAdditionalInformation('bede_pay_error', 'Payment gateway did not return a valid URL.');
         }
+    }
+
+    protected function saveLogData(array $data)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+        $connection = $resource->getConnection();
+        $tableName = $resource->getTableName('bede_payment_logs');
+
+        $connection->insert($tableName, $data);
     }
 
     public function getPayUrl(): string
