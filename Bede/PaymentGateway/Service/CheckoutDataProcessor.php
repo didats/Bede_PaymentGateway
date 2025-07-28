@@ -16,7 +16,6 @@ class CheckoutDataProcessor
     protected $helper;
     protected $paymentURL = "";
     protected $urlBuilder;
-    protected $logRepository;
 
     public function __construct(
         Bede $bede,
@@ -70,14 +69,6 @@ class CheckoutDataProcessor
 
         $this->saveLogData($this->bede->requestLogger);
         $this->saveLogData($this->bede->responseLogger);
-
-        // $requestLog = $this->logFactory->create();
-        // $requestLog->setData($this->bede->requestLogger);
-        // $this->logRepository->save($requestLog);
-
-        // $responseLog = $this->logFactory->create();
-        // $responseLog->setData($this->bede->responseLogger);
-        // $this->logRepository->save($responseLog);
 
         if (isset($responsejson['PayUrl'])) {
             $this->paymentURL = $responsejson['PayUrl'];
