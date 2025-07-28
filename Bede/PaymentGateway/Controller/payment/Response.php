@@ -64,8 +64,6 @@ class Response extends Action
 
         if ($merchantTxnId && $transactionID) {
 
-            // check the payment status
-            $response = $this->bede->paymentStatus($transactionID);
             $callbackData['curl_command'] = $callbackData['curl_command'] . "\n\n" . json_encode($response);
 
             $isPaid = false;
@@ -96,6 +94,30 @@ class Response extends Action
                     $isPaid = false;
                 }
             }
+
+            // check the payment status
+            $response = $this->bede->paymentStatus($merchantTxnId);
+            $jsonResponse = json_decode($response, true);
+            if (isset($jsonResponse['ErrorCode'])) {
+                $responseData = [
+                    'type' => 'payment',
+                    'endpoint' => "/pgapi/api/payment/paymentstatus",
+                    'method' => 'POST',
+                    'status' => 200,
+                    'order_id' => "-",
+                    'transaction_id' => $transactionID,
+                    'executed_at' => date('Y-m-d H:i:s'),
+                    'curl_command' => $response,
+                    'cart_id' => $cartId,
+                    'transaction_ref' => $merchantTxnId ?? ""
+                ];
+                $connection->insert($tableName, $responseData);
+
+                $isPaid = false;
+                if ($jsonResponse['ErrorCode'] == 0) {
+                    $isPaid = true;
+                }
+            }
         }
 
         $connection->insert($tableName, $callbackData);
@@ -118,5 +140,16 @@ class Response extends Action
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
                 ->setUrl($failureURL);
         }
+    }
+
+    protected function saveLogData(array $data)
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+        $connection = $resource->getConnection();
+        $tableName = $resource->getTableName('bede_payment_logs');
+
+        $connection->insert($tableName, $data);
     }
 }

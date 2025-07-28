@@ -251,13 +251,15 @@ CURL;
         $hashInput = $this->merchantID . '|' . $this->secretKey;
         $hashMac = hash('sha512', $hashInput);
 
-        $response = $this->exec($path, [
+        $data = [
             'Mid' => $this->merchantID,
             'MerchantTxnRefNo' => [
                 $transactionID
             ],
             'HashMac' => $hashMac
-        ]);
+        ];
+
+        $response = $this->exec($path, $data);
 
         return $response;
     }
