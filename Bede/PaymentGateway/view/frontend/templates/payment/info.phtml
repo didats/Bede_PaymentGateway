@@ -1,0 +1,59 @@
+<?php $paymentInfo = $this->getPaymentInfo(); ?>
+<?php if ($paymentInfo): ?>
+    <div class="bede-payment-info" style="margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 8px; background-color: #f9f9f9; font-family: Arial, sans-serif;">
+
+        <?php if ($this->isSuccessPage()): ?>
+            <div style="color: #4CAF50; font-weight: bold; font-size: 20px; margin-bottom: 15px; text-align: center;">
+                ✅ Payment Successful!
+            </div>
+            <?php
+            $successFields = [
+                'Order ID' => $paymentInfo['order_id'],
+                'Transaction ID' => $paymentInfo['transaction_id'],
+                'Payment Method' => $paymentInfo['payment_type'],
+                'Payment ID' => $paymentInfo['payment_id'],
+                'Bank Reference' => $paymentInfo['bank_reference'],
+                'Amount' => $paymentInfo['amount'] ? $paymentInfo['amount'] . ' ' . $paymentInfo['currency'] : null
+            ];
+            ?>
+
+        <?php elseif ($this->isFailurePage()): ?>
+            <div style="color: #f44336; font-weight: bold; font-size: 20px; margin-bottom: 15px; text-align: center;">
+                ❌ Payment Failed
+            </div>
+            <?php
+            $successFields = [
+                'Order ID' => $paymentInfo['order_id'],
+                'Transaction ID' => $paymentInfo['transaction_id'],
+                'Error Message' => $paymentInfo['error_message'],
+                'Error Code' => $paymentInfo['error_code']
+            ];
+            ?>
+        <?php endif; ?>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <?php foreach ($successFields as $label => $value): ?>
+                <?php if (!empty($value)): ?>
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 10px; background-color: #f5f5f5; font-weight: bold; width: 40%; vertical-align: top;">
+                            <?= $this->escapeHtml($label) ?>:
+                        </td>
+                        <td style="padding: 10px; background-color: #fff; word-break: break-word;">
+                            <?= $this->escapeHtml($value) ?>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </table>
+
+        <?php if ($this->isSuccessPage()): ?>
+            <div style="margin-top: 15px; padding: 10px; background-color: #e8f5e8; border-left: 4px solid #4CAF50; color: #2e7d32;">
+                <strong>Thank you for your payment!</strong> Your transaction has been processed successfully.
+            </div>
+        <?php else: ?>
+            <div style="margin-top: 15px; padding: 10px; background-color: #ffebee; border-left: 4px solid #f44336; color: #c62828;">
+                <strong>Payment could not be processed.</strong> Please try again or contact support if the issue persists.
+            </div>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>

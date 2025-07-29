@@ -151,8 +151,19 @@ class Response extends Action
 
             $order->save();
 
+            $successUrlWithParams = $successURL . (strpos($successURL, '?') !== false ? '&' : '?') . http_build_query([
+                'status' => 'success',
+                'order_id' => $order->getIncrementId(),
+                'transaction_id' => $transactionID,
+                'payment_type' => $paymentType,
+                'payment_id' => $paymentID,
+                'bank_reference' => $bankReference,
+                'amount' => $order->getGrandTotal(),
+                'currency' => $order->getOrderCurrencyCode()
+            ]);
+
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl($successURL);
+                ->setUrl($successUrlWithParams);
         } else {
             $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED)
                 ->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
@@ -168,8 +179,16 @@ class Response extends Action
 
             $order->save();
 
+            $failureUrlWithParams = $failureURL . (strpos($failureURL, '?') !== false ? '&' : '?') . http_build_query([
+                'status' => 'failure',
+                'order_id' => $order ? $order->getIncrementId() : '',
+                'error_message' => $errorMessage,
+                'error_code' => $errorCode,
+                'transaction_id' => $transactionID ?? $merchantTxnId
+            ]);
+
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
-                ->setUrl($failureURL);
+                ->setUrl($failureUrlWithParams);
         }
     }
 
