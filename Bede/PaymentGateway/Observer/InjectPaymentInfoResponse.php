@@ -70,10 +70,10 @@ class InjectPaymentInfoResponse implements ObserverInterface
         $errorMessage = $request->getParam('error_message');
         $errorCode = $request->getParam('error_code');
 
-        $html = '<div class="bede-payment-info" style="margin: 20px 0; padding: 20px; border: 2px solid #ddd; border-radius: 8px; background-color: #f9f9f9; font-family: Arial, sans-serif;">';
+        $html = '<div class="bede-payment-info">';
 
         if ($isSuccess) {
-            $html .= '<div style="color: #4CAF50; font-weight: bold; font-size: 20px; margin-bottom: 15px; text-align: center;">✅ Payment Successful!</div>';
+            $html .= '<h3>Payment Successful!</h3>';
 
             $fields = [
                 'Order ID' => $orderId,
@@ -85,7 +85,7 @@ class InjectPaymentInfoResponse implements ObserverInterface
                 'Amount' => $amount
             ];
         } else {
-            $html .= '<div style="color: #f44336; font-weight: bold; font-size: 20px; margin-bottom: 15px; text-align: center;">❌ Payment Failed</div>';
+            $html .= '<h3>Payment Failed</h3>';
 
             $fields = [
                 'Order ID' => $orderId,
@@ -96,13 +96,13 @@ class InjectPaymentInfoResponse implements ObserverInterface
             ];
         }
 
-        $html .= '<table style="width: 100%; border-collapse: collapse; margin-top: 10px;">';
+        $html .= '<table class="table">';
 
         foreach ($fields as $label => $value) {
             if (!empty($value)) {
-                $html .= '<tr style="border-bottom: 1px solid #ddd;">';
-                $html .= '<td style="padding: 10px; background-color: #f5f5f5; font-weight: bold; width: 40%; vertical-align: top;">' . htmlspecialchars($label) . ':</td>';
-                $html .= '<td style="padding: 10px; background-color: #fff; word-break: break-word;">' . htmlspecialchars($value) . '</td>';
+                $html .= '<tr>';
+                $html .= '<td class="label" width="30%">' . htmlspecialchars($label) . ':</td>';
+                $html .= '<td>' . htmlspecialchars($value) . '</td>';
                 $html .= '</tr>';
             }
         }
@@ -110,9 +110,9 @@ class InjectPaymentInfoResponse implements ObserverInterface
         $html .= '</table>';
 
         if ($isSuccess) {
-            $html .= '<div style="margin-top: 15px; padding: 10px; background-color: #e8f5e8; border-left: 4px solid #4CAF50; color: #2e7d32;"><strong>Thank you for your payment!</strong> Your transaction has been processed successfully.</div>';
+            $html .= '<h4>Thank you for your payment!</h4> <p>Your transaction has been processed successfully.</p>';
         } else {
-            $html .= '<div style="margin-top: 15px; padding: 10px; background-color: #ffebee; border-left: 4px solid #f44336; color: #c62828;"><strong>Payment could not be processed.</strong> Please try again or contact support if the issue persists.</div>';
+            $html .= '<h4>Payment could not be processed.</h4> <p>Please try again or contact support if the issue persists.</p>';
         }
 
         $html .= '</div>';
