@@ -155,11 +155,11 @@ class Response extends Action
                 'status' => 'success',
                 'order_id' => $order->getIncrementId(),
                 'transaction_id' => $transactionID,
+                'merchant_transaction_id' => $merchantTxnId,
                 'payment_type' => $paymentType,
                 'payment_id' => $paymentID,
                 'bank_reference' => $bankReference,
-                'amount' => $order->getGrandTotal(),
-                'currency' => $order->getOrderCurrencyCode()
+                'amount' => $order->getOrderCurrencyCode() . " " . $order->getGrandTotal(),
             ]);
 
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
@@ -184,7 +184,8 @@ class Response extends Action
                 'order_id' => $order ? $order->getIncrementId() : '',
                 'error_message' => $errorMessage,
                 'error_code' => $errorCode,
-                'transaction_id' => $transactionID ?? $merchantTxnId
+                'transaction_id' => $transactionID ?? "",
+                'merchant_transaction_id' => $merchantTxnId,
             ]);
 
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
