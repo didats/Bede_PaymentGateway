@@ -1,0 +1,124 @@
+<?php
+// Add this debug at the top
+echo "DEBUG: Template is loading<br>";
+var_dump("Block class: " . get_class($this));
+?>
+<div class="admin__page-nav-title">
+    <h1 class="page-title"><?= __('Refund Management') ?></h1>
+</div>
+
+<!-- Add this debug -->
+<div style="background: yellow; padding: 10px; margin: 10px 0;">
+    <strong>DEBUG INFO:</strong><br>
+    Search URL: <?= $this->getSearchUrl() ?><br>
+    Block loaded: Yes
+</div>
+
+<div class="admin__data-grid-wrap">
+    <!-- Search Form -->
+    <div class="admin__data-grid-header">
+        <form id="refund-search-form" class="admin__data-grid-filters">
+            <div class="admin__data-grid-filters-wrap">
+                <div class="data-grid-filters-actions-wrap">
+                    <div class="data-grid-filters-action-wrap">
+                        <button type="button" class="action-default" id="search-button">
+                            <span><?= __('Search') ?></span>
+                        </button>
+                        <button type="button" class="action-default" id="clear-button">
+                            <span><?= __('Clear') ?></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin__data-grid-filters-current">
+                    <div class="admin__field-row">
+                        <div class="admin__field admin__field-small">
+                            <div class="admin__field-label">
+                                <label for="order_id"><?= __('Order ID') ?></label>
+                            </div>
+                            <div class="admin__field-control">
+                                <input type="text" id="order_id" name="order_id" class="admin__control-text" placeholder="<?= __('Enter Order ID') ?>">
+                            </div>
+                        </div>
+
+                        <div class="admin__field admin__field-small">
+                            <div class="admin__field-label">
+                                <label for="transaction_id"><?= __('Transaction ID') ?></label>
+                            </div>
+                            <div class="admin__field-control">
+                                <input type="text" id="transaction_id" name="transaction_id" class="admin__control-text" placeholder="<?= __('Enter Transaction ID') ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin__field-row">
+                        <div class="admin__field admin__field-small">
+                            <div class="admin__field-label">
+                                <label for="date_from"><?= __('Date From') ?></label>
+                            </div>
+                            <div class="admin__field-control">
+                                <input type="date" id="date_from" name="date_from" class="admin__control-text">
+                            </div>
+                        </div>
+
+                        <div class="admin__field admin__field-small">
+                            <div class="admin__field-label">
+                                <label for="date_to"><?= __('Date To') ?></label>
+                            </div>
+                            <div class="admin__field-control">
+                                <input type="date" id="date_to" name="date_to" class="admin__control-text">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin__field-row">
+                        <div class="admin__field admin__field-small">
+                            <div class="admin__field-label">
+                                <label for="order_status"><?= __('Order Status') ?></label>
+                            </div>
+                            <div class="admin__field-control">
+                                <select id="order_status" name="order_status" class="admin__control-select">
+                                    <?php foreach ($this->getOrderStatusOptions() as $value => $label): ?>
+                                        <option value="<?= $value ?>"><?= $label ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Table -->
+    <div id="search-results" style="display: none;">
+        <div class="admin__data-grid-wrap">
+            <table class="data-grid" id="results-table">
+                <thead>
+                    <tr>
+                        <th><?= __('Order ID') ?></th>
+                        <th><?= __('Customer') ?></th>
+                        <th><?= __('Status') ?></th>
+                        <th><?= __('Total') ?></th>
+                        <th><?= __('Date') ?></th>
+                        <th><?= __('Transaction ID') ?></th>
+                        <th><?= __('Actions') ?></th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+    "*": {
+        "Bede_PaymentGateway/js/refund-search": {
+            "searchUrl": "<?= $block->getSearchUrl() ?>",
+            "refundUrl": "<?= $block->getRefundUrl() ?>"
+        }
+    }
+}
+</script>

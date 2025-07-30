@@ -39,7 +39,7 @@
             module="Bede_PaymentGateway" 
             sortOrder="20" 
             parent="Bede_PaymentGateway::bede_payment" 
-            action="Bede_PaymentGateway/refund/index" 
+            action="bedepg/refund/index" 
             resource="Bede_PaymentGateway::refund"
         />
     </menu>
