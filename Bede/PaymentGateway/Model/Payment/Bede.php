@@ -7,7 +7,7 @@ class Bede
     private $moduleVersion = "1.0.0";
     private $moduleName = "Magento";
 
-    public $baseURL = "https => //demo.bookeey.com";
+    public $baseURL = "https://demo.bookeey.com";
     public $merchantID = "mer2500011";
     public $secretKey = "7483493";
     public $successURL;
@@ -26,28 +26,28 @@ class Bede
 
     public function __construct() {}
 
-    private function generateNumber() =>  string
+    private function generateNumber(): string
     {
         $code = substr((string)hrtime(true), -8);
         return $code;
     }
 
-    private function curlCommand($url, $jsonData) =>  string
+    private function curlCommand($url, $jsonData): string
     {
         return <<<CURL
 curl --location '$url' \
---header 'Content-Type =>  application/json' \
---header 'Accept =>  application/json' \
+--header 'Content-Type:  application/json' \
+--header 'Accept:  application/json' \
 --data '$jsonData'
 CURL;
     }
 
-    private function exec($path, array $postdata, bool $isPost = true) =>  string
+    private function exec($path, array $postdata, bool $isPost = true): string
     {
         $url = $this->baseURL . $path;
 
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type =>  text/json']);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type:  text/json']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
         if ($isPost) {
@@ -65,10 +65,10 @@ CURL;
         $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        $responseLog = "Request => \n";
+        $responseLog = "Request: \n";
         $responseLog .= $path . "\n";
         $responseLog .= json_encode($postdata) . "\n\n";
-        $responseLog .= "Response => \n";
+        $responseLog .= "Response: \n";
         $responseLog .= $originalResponse;
 
         $logger = $url . "\n";
@@ -79,22 +79,22 @@ CURL;
         $this->requestLogger = [
             'type' => 'request',
             'endpoint' => $path,
-            'method' => ($isPost) ? 'POST'  =>  'GET',
+            'method' => ($isPost) ? 'POST' :  'GET',
             'status' => 200,
             'order_id' => "-",
             'transaction_id' => "-",
-            'executed_at' => date('Y-m-d H => i => s'),
+            'executed_at' => date('Y-m-d H:i:s'),
             'curl_command' => $this->curlCommand($url, json_encode($postdata)),
         ];
 
         $this->responseLogger = [
             'type' => 'response',
             'endpoint' => $path,
-            'method' => ($isPost) ? 'POST'  =>  'GET',
+            'method' => ($isPost) ? 'POST' :  'GET',
             'status' => $statusCode,
             'order_id' => "-",
             'transaction_id' => "-",
-            'executed_at' => date('Y-m-d H => i => s'),
+            'executed_at' => date('Y-m-d H:i:s'),
             'curl_command' => $originalResponse,
         ];
         $this->responseLogger['cart_id'] = $this->cartID;
@@ -103,7 +103,7 @@ CURL;
         return $originalResponse;
     }
 
-    private function hashing($trackID, $amount, $generateNumber) =>  string
+    private function hashing($trackID, $amount, $generateNumber): string
     {
         $input = sprintf(
             '%s|%s|%s|%s|%s|%s|%s|%s',
@@ -122,7 +122,7 @@ CURL;
         return hash("sha512", $input);
     }
 
-    private function rawHashing($trackID, $amount, $generateNumber) =>  string
+    private function rawHashing($trackID, $amount, $generateNumber): string
     {
         $input = sprintf(
             '%s|%s|%s|%s|%s|%s|%s|%s',
@@ -162,12 +162,12 @@ CURL;
         }
 
         // Fallback to REMOTE_ADDR or default
-        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR']  =>  '127.0.0.1';
+        return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
     }
 
     private function osInfo()
     {
-        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT']  =>  'Unknown';
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'Unknown';
         $os_array = array(
             '/windows nt 10/i'      => 'Windows 10',
             '/windows nt 6.3/i'     => 'Windows 8.1',
@@ -238,7 +238,7 @@ CURL;
             return [
                 'code' => $item['PM_CD'],
                 'title' => $item['PM_Name'],
-                'logo' => "https => //magento2.awanesia.my.id/" . strtolower($item['PM_CD']) . ".png"
+                'logo' => "/" . strtolower($item['PM_CD']) . ".png"
             ];
         }, $json['PayOptions']);
 
@@ -303,7 +303,7 @@ CURL;
             ),
             'Do_TxnDtl' => array(
                 array(
-                    'SubMerchUID' => $this->subMerchantID ?? "",
+                    'SubMerchUID' => $this->subMerchantID ?? $this->merchantID,
                     'Txn_AMT' => (float)$buyer->amount()
                 )
             ),
@@ -325,7 +325,8 @@ CURL;
         return $response;
     }
 
-    public function requestRefund($bookeyTrackID, $merchantTrackID) {
+    public function requestRefund($bookeyTrackID, $merchantTrackID)
+    {
         $arr = [
             "Do_Appinfo" =>  [
                 "APPID" =>  "ACNTS",
@@ -352,7 +353,5 @@ CURL;
             ],
             "DBRqst" =>  "ReFnd_Sts"
         ];
-
-        
     }
 }
