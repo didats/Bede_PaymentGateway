@@ -2,16 +2,30 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
     <table name="bede_payment_logs" resource="default" engine="innodb" comment="Bede Payment Logs Table">
         <column xsi:type="bigint" name="id" padding="20" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
-        <column xsi:type="varchar" name="type" length="255" nullable="false" comment="Type (response, request)"/>
-        <column xsi:type="varchar" name="endpoint" length="255" nullable="false" comment="Endpoint"/>
-        <column xsi:type="varchar" name="method" length="255" nullable="false" comment="Method"/>
-        <column xsi:type="int" name="status" padding="11" nullable="false" comment="Status"/>
-        <column xsi:type="bigint" name="order_id" padding="20" unsigned="true" nullable="true" comment="Order ID"/>
-        <column xsi:type="bigint" name="transaction_id" padding="20" unsigned="true" nullable="true" comment="Transaction ID"/>
-        <column xsi:type="bigint" name="cart_id" padding="20" unsigned="true" nullable="true" comment="Cart ID"/>
-        <column xsi:type="varchar" length="255" name="transaction_ref" nullable="true" comment="Transaction Reference"/>
-        <column xsi:type="datetime" name="executed_at" nullable="false" comment="Executed At"/>
-        <column xsi:type="text" name="curl_command" nullable="true" comment="cURL Command"/>
+        <column xsi:type="varchar" name="type" length="255" nullable="true" comment="Type"/>
+        <column xsi:type="varchar" name="endpoint" length="255" nullable="true" comment="Endpoint"/>
+        <column xsi:type="varchar" name="method" length="255" nullable="true" comment="Method"/>
+        <column xsi:type="int" name="status" padding="11" nullable="true" comment="Status"/>
+        <column xsi:type="text" name="request_data" unsigned="true" nullable="true" comment="Request Data"/>
+        <column xsi:type="text" name="response_data" unsigned="true" nullable="true" comment="Response Data"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="bede_payments" resource="default" engine="innodb" comment="Bede Payment Data Table">
+        <column xsi:type="bigint" name="id" padding="20" unsigned="true" nullable="false" identity="true" comment="Data ID"/>
+        <column xsi:type="varchar" name="cart_id" length="255" nullable="false" comment="Cart ID"/>
+        <column xsi:type="varchar" name="order_id" length="255" nullable="false" comment="Order ID"/>
+        <column xsi:type="varchar" name="merchant_track_id" length="255" nullable="false" comment="Merchant Transaction ID"/>
+        <column xsi:type="varchar" name="transaction_id" length="255" nullable="false" comment="Transaction ID"/>
+        <column xsi:type="varchar" name="payment_id" padding="11" nullable="false" comment="Payment ID"/>
+        <column xsi:type="varchar" name="payment_status" padding="20" unsigned="true" nullable="true" comment="Payment Status"/>
+        <column xsi:type="varchar" name="bookeey_track_id" padding="20" unsigned="true" nullable="true" comment="Bookeey Track ID"/>
+        <column xsi:type="varchar" name="bank_ref_number" padding="20" unsigned="true" nullable="true" comment="Bank Reference Number"/>
+        <column xsi:type="varchar" length="255" name="payment_method" nullable="true" comment="Payment Method"/>
+        <column xsi:type="int" name="error_code" nullable="false" comment="Error Code"/>
+        <column xsi:type="varchar" name="final_status" nullable="true" comment="Created At"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
