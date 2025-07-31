@@ -4,9 +4,27 @@ namespace Bede\PaymentGateway\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Bede\PaymentGateway\Helper\Data;
+use Bede\PaymentGateway\Model\Payment\PaymentRepository;
+use Psr\Log\LoggerInterface;
 
 class InjectPaymentInfoResponse implements ObserverInterface
 {
+
+    protected $helper;
+    protected $paymentRepository;
+    protected $logger;
+
+    public function __construct(
+        Data $helper,
+        PaymentRepository $paymentRepository,
+        LoggerInterface $logger
+    ) {
+        $this->helper = $helper;
+        $this->paymentRepository = $paymentRepository;
+        $this->logger = $logger;
+    }
+
     public function execute(Observer $observer)
     {
         /** @var \Magento\Framework\App\Response\Http $response */
@@ -15,22 +33,25 @@ class InjectPaymentInfoResponse implements ObserverInterface
         /** @var \Magento\Framework\App\Request\Http $request */
         $request = $observer->getEvent()->getRequest();
 
-        // Get your success/failure URLs from config
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $helper = $objectManager->get(\Bede\PaymentGateway\Helper\Data::class);
-
-        $successUrl = $helper->getSuccessUrl();
-        $failureUrl = $helper->getFailureUrl();
+        $successUrl = $this->helper->getSuccessUrl();
+        $failureUrl = $this->helper->getFailureUrl();
 
         // Extract the path from the URLs
         $successPath = parse_url($successUrl, PHP_URL_PATH);
         $failurePath = parse_url($failureUrl, PHP_URL_PATH);
         $currentPath = parse_url($request->getRequestUri(), PHP_URL_PATH);
 
-
         if ($currentPath === $successPath || $currentPath === $failurePath) {
+            $merchantTxnId = $request->getParam('merchant_transaction_id');
+
+            // Fetch payment data from database
+            $paymentData = null;
+            if ($merchantTxnId) {
+                $paymentData = $this->paymentRepository->getPaymentByMerchantTrackId($merchantTxnId);
+            }
+
             // Generate the payment info HTML
-            $paymentHtml = $this->generatePaymentInfoHtml($request, ($currentPath === $successPath));
+            $paymentHtml = $this->generatePaymentInfoHtml($request, $paymentData, ($currentPath === $successPath));
 
             // Get the current response body
             $body = $response->getBody();
@@ -57,8 +78,9 @@ class InjectPaymentInfoResponse implements ObserverInterface
         }
     }
 
-    private function generatePaymentInfoHtml($request, bool $isSuccess)
+    private function generatePaymentInfoHtml($request, ?array $paymentData, bool $isSuccess)
     {
+        // Get data from request parameters (fallback)
         $status = $request->getParam('status');
         $orderId = $request->getParam('order_id');
         $transactionId = $request->getParam('transaction_id');
@@ -69,6 +91,25 @@ class InjectPaymentInfoResponse implements ObserverInterface
         $amount = $request->getParam('amount');
         $errorMessage = $request->getParam('error_message');
         $errorCode = $request->getParam('error_code');
+        $paymentStatus = $request->getParam('payment_status');
+
+        if ($paymentData) {
+            $orderId = $paymentData['order_id'] ?: $orderId;
+            $transactionId = $paymentData['transaction_id'] ?: $transactionId;
+            $merchantTxnId = $paymentData['merchant_track_id'] ?: $merchantTxnId;
+            $paymentType = $paymentData['payment_method'] ?: $paymentType;
+            $paymentId = $paymentData['payment_id'] ?: $paymentId;
+            $bankReference = $paymentData['bank_ref_number'] ?: $bankReference;
+            $amount = $paymentData['amount'] ? number_format($paymentData['amount'], 2) : $amount;
+            $errorCode = $paymentData['error_code'] ?: $errorCode;
+
+            // Additional data from database
+            $cartId = $paymentData['cart_id'];
+            $paymentStatus = $paymentData['payment_status'];
+            $bookeeyTrackId = $paymentData['bookeey_track_id'];
+            $createdAt = $paymentData['created_at'];
+            $updatedAt = $paymentData['updated_at'];
+        }
 
         $html = '<div class="bede-payment-info">';
 
@@ -82,6 +123,7 @@ class InjectPaymentInfoResponse implements ObserverInterface
                 'Payment Method' => $paymentType,
                 'Payment ID' => $paymentId,
                 'Bank Reference' => $bankReference,
+                'Payment Status' => $paymentStatus,
                 'Amount' => $amount
             ];
         } else {
@@ -91,8 +133,7 @@ class InjectPaymentInfoResponse implements ObserverInterface
                 'Order ID' => $orderId,
                 'Transaction ID' => $transactionId,
                 'Merchant Transaction ID' => $merchantTxnId,
-                'Error Message' => $errorMessage,
-                'Error Code' => $errorCode
+                'Payment Status' => $paymentStatus,
             ];
         }
 

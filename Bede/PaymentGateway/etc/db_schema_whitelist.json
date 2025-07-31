@@ -12,7 +12,51 @@
             "transaction_ref": true,
             "executed_at": true,
             "curl_command": true,
-            "created_at": true
+            "created_at": true,
+            "request_data": true,
+            "response_data": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "BEDE_PAYMENT_LOGS_TYPE_ENDPOINT_STATUS": true
+        }
+    },
+    "bede_payments": {
+        "column": {
+            "id": true,
+            "cart_id": true,
+            "amount": true,
+            "order_id": true,
+            "merchant_track_id": true,
+            "transaction_id": true,
+            "payment_id": true,
+            "payment_status": true,
+            "bookeey_track_id": true,
+            "bank_ref_number": true,
+            "payment_method": true,
+            "error_code": true,
+            "final_status": true,
+            "refund_status": true,
+            "refund_amount": true,
+            "refund_request": true,
+            "refund_response": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "BEDE_PAYMENTS_CART_ID": true,
+            "BEDE_PAYMENTS_AMOUNT": true,
+            "BEDE_PAYMENTS_ORDER_ID": true,
+            "BEDE_PAYMENTS_TRANSACTION_ID": true,
+            "BEDE_PAYMENTS_MERCHANT_TRACK_ID": true,
+            "BEDE_PAYMENTS_BOOKEEY_TRACK_ID": true,
+            "BEDE_PAYMENTS_PAYMENT_ID": true,
+            "BEDE_PAYMENTS_ERROR_CODE": true,
+            "BEDE_PAYMENTS_PAYMENT_STATUS": true,
+            "BEDE_PAYMENTS_REFUND_STATUS": true,
+            "BEDE_PAYMENTS_CREATED_AT": true
         },
         "constraint": {
             "PRIMARY": true

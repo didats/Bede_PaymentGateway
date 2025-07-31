@@ -2,35 +2,84 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
     <table name="bede_payment_logs" resource="default" engine="innodb" comment="Bede Payment Logs Table">
         <column xsi:type="bigint" name="id" padding="20" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
+        <column xsi:type="varchar" name="merchant_track_id" length="255" nullable="true" comment="Merchant Track ID"/>
         <column xsi:type="varchar" name="type" length="255" nullable="true" comment="Type"/>
+        <column xsi:type="varchar" name="baseurl" length="255" nullable="true" comment="Base URL"/>
         <column xsi:type="varchar" name="endpoint" length="255" nullable="true" comment="Endpoint"/>
         <column xsi:type="varchar" name="method" length="255" nullable="true" comment="Method"/>
         <column xsi:type="int" name="status" padding="11" nullable="true" comment="Status"/>
-        <column xsi:type="text" name="request_data" unsigned="true" nullable="true" comment="Request Data"/>
-        <column xsi:type="text" name="response_data" unsigned="true" nullable="true" comment="Response Data"/>
+        <column xsi:type="text" name="request_data" nullable="true" comment="Request Data"/>
+        <column xsi:type="text" name="response_data" nullable="true" comment="Response Data"/>
         <column xsi:type="datetime" name="created_at" nullable="false" comment="Created At"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
+
+        <index referenceId="BEDE_PAYMENTS_LOG_INDEX" indexType="btree">
+            <column name="type"/>
+            <column name="endpoint"/>
+            <column name="status"/>
+        </index>
     </table>
+    
     <table name="bede_payments" resource="default" engine="innodb" comment="Bede Payment Data Table">
         <column xsi:type="bigint" name="id" padding="20" unsigned="true" nullable="false" identity="true" comment="Data ID"/>
-        <column xsi:type="varchar" name="cart_id" length="255" nullable="false" comment="Cart ID"/>
-        <column xsi:type="varchar" name="order_id" length="255" nullable="false" comment="Order ID"/>
-        <column xsi:type="varchar" name="merchant_track_id" length="255" nullable="false" comment="Merchant Transaction ID"/>
-        <column xsi:type="varchar" name="transaction_id" length="255" nullable="false" comment="Transaction ID"/>
-        <column xsi:type="varchar" name="payment_id" padding="11" nullable="false" comment="Payment ID"/>
-        <column xsi:type="varchar" name="payment_status" padding="20" unsigned="true" nullable="true" comment="Payment Status"/>
-        <column xsi:type="varchar" name="bookeey_track_id" padding="20" unsigned="true" nullable="true" comment="Bookeey Track ID"/>
-        <column xsi:type="varchar" name="bank_ref_number" padding="20" unsigned="true" nullable="true" comment="Bank Reference Number"/>
-        <column xsi:type="varchar" length="255" name="payment_method" nullable="true" comment="Payment Method"/>
-        <column xsi:type="int" name="error_code" nullable="false" comment="Error Code"/>
-        <column xsi:type="varchar" name="final_status" nullable="true" comment="Created At"/>
-        <column xsi:type="varchar" name="refund_status" nullable="true" comment="Created At"/>
-        <column xsi:type="varchar" name="refund_amount" nullable="true" comment="Created At"/>
-        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
+        <column xsi:type="varchar" name="cart_id" length="255" nullable="true" comment="Cart ID"/>
+        <column xsi:type="decimal" name="amount" scale="4" precision="12" nullable="true" comment="Payment Amount"/>
+        <column xsi:type="varchar" name="order_id" length="255" nullable="true" comment="Order ID"/>
+        <column xsi:type="varchar" name="merchant_track_id" length="255" nullable="true" comment="Merchant Transaction ID"/>
+        <column xsi:type="varchar" name="transaction_id" length="255" nullable="true" comment="Transaction ID"/>
+        <column xsi:type="varchar" name="payment_id" length="255" nullable="true" comment="Payment ID"/>
+        <column xsi:type="varchar" name="payment_status" length="100" nullable="true" comment="Payment Status"/>
+        <column xsi:type="varchar" name="bookeey_track_id" length="255" nullable="true" comment="Bookeey Track ID"/>
+        <column xsi:type="varchar" name="bank_ref_number" length="255" nullable="true" comment="Bank Reference Number"/>
+        <column xsi:type="varchar" name="payment_method" length="255" nullable="true" comment="Payment Method"/>
+        <column xsi:type="int" name="error_code" nullable="true" comment="Error Code"/>
+        <column xsi:type="varchar" name="final_status" length="100" nullable="true" comment="Final Status"/>
+        <column xsi:type="varchar" name="refund_status" length="100" nullable="true" comment="Refund Status"/>
+        <column xsi:type="decimal" name="refund_amount" scale="4" precision="12" nullable="true" comment="Refund Amount"/>
+        <column xsi:type="text" name="refund_request" nullable="true" comment="Refund Request Data"/>
+        <column xsi:type="text" name="refund_response" nullable="true" comment="Refund Response Data"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
+        
+        <!-- Optimized indexes for better performance -->
+        <index referenceId="BEDE_PAYMENTS_CART_ID" indexType="btree">
+            <column name="cart_id"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_AMOUNT" indexType="btree">
+            <column name="amount"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_TRANSACTION_ID" indexType="btree">
+            <column name="transaction_id"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_MERCHANT_TRACK_ID" indexType="btree">
+            <column name="merchant_track_id"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_BOOKEEY_TRACK_ID" indexType="btree">
+            <column name="bookeey_track_id"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_PAYMENT_ID" indexType="btree">
+            <column name="payment_id"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_ERROR_CODE" indexType="btree">
+            <column name="error_code"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_PAYMENT_STATUS" indexType="btree">
+            <column name="payment_status"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_REFUND_STATUS" indexType="btree">
+            <column name="refund_status"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
     </table>
 </schema>

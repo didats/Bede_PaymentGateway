@@ -4,18 +4,18 @@ namespace Bede\PaymentGateway\Model\Payment;
 
 use Bede\PaymentGateway\Helper\Data;
 use Bede\PaymentGateway\Model\Payment\Bede;
-use Bede\PaymentGateway\Model\LogFactory;
+use Bede\PaymentGateway\Model\Payment\PaymentRepository;
 
 class MethodList
 {
     protected $bede;
     protected $helper;
-    protected $logFactory;
+    protected $paymentRepository;
 
-    public function __construct(Data $helper, LogFactory $logFactory)
+    public function __construct(Data $helper, PaymentRepository $paymentRepository,)
     {
         $this->helper = $helper;
-        $this->logFactory = $logFactory;
+        $this->paymentRepository = $paymentRepository;
 
         $this->bede = new Bede();
         $this->bede->merchantID = $helper->getMerchantId();
@@ -37,13 +37,7 @@ class MethodList
         // Call your API to get available methods
         $response = $this->bede->paymentMethods();
 
-        $requestLog = $this->logFactory->create();
-        $requestLog->setData($this->bede->requestLogger);
-        $requestLog->save();
-
-        $responseLog = $this->logFactory->create();
-        $responseLog->setData($this->bede->responseLogger);
-        $responseLog->save();
+        $this->paymentRepository->addLog($this->bede->logData);
 
         return $response;
     }

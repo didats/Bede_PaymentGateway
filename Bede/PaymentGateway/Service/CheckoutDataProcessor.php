@@ -7,6 +7,7 @@ use Bede\PaymentGateway\Model\Payment\BedeBuyer;
 use Bede\PaymentGateway\Model\LogFactory;
 use Bede\PaymentGateway\Helper\Data;
 use Magento\Framework\UrlInterface;
+use Bede\PaymentGateway\Model\Payment\PaymentRepository;
 
 class CheckoutDataProcessor
 {
@@ -16,10 +17,12 @@ class CheckoutDataProcessor
     protected $helper;
     protected $paymentURL = "";
     protected $urlBuilder;
+    protected $paymentRepository;
 
     public function __construct(
         Bede $bede,
         BedeBuyer $buyer,
+        PaymentRepository $paymentRepository,
         Data $helper,
         UrlInterface $urlBuilder
     ) {
@@ -27,12 +30,28 @@ class CheckoutDataProcessor
         $this->buyer = $buyer;
         $this->helper = $helper;
         $this->urlBuilder = $urlBuilder;
+        $this->paymentRepository = $paymentRepository;
     }
 
     public function process($payment, $selectedSubmethod)
     {
         $quote = $payment->getQuote();
+
         if (!$quote) {
+            return;
+        }
+
+        $existingTrackId = $payment->getAdditionalInformation('bede_merchant_track_id');
+        if ($existingTrackId) {
+            // Already processed, return existing data
+            error_log("CheckoutDataProcessor: Already processed for trackID: " . $existingTrackId);
+            return;
+        }
+
+        $existingPayment = $this->paymentRepository->getPaymentByCartId($quote->getId());
+        if ($existingPayment && !empty($existingPayment['merchant_track_id'])) {
+            error_log("CheckoutDataProcessor: Payment already exists in DB for cart: " . $quote->getId());
+            $payment->setAdditionalInformation('bede_merchant_track_id', $existingPayment['merchant_track_id']);
             return;
         }
 
@@ -63,12 +82,22 @@ class CheckoutDataProcessor
         $this->buyer->countryCode = $this->buyer->countryDialCode($countryCode);
         $this->buyer->orderID = $quote->getId();
 
+        $payment->setTrasactionId($this->buyer->trackID);
+
         // Call API, log, etc.
         $response = $this->bede->requestLink($this->buyer, $selectedSubmethod);
         $responsejson = json_decode($response, true);
 
-        $this->saveLogData($this->bede->requestLogger);
-        $this->saveLogData($this->bede->responseLogger);
+        $this->paymentRepository->addLog($this->bede->logData);
+
+        // add payment data
+        $this->paymentRepository->addPaymentData([
+            'cart_id' => $quote->getId(),
+            'amount' => $grandTotal,
+            'merchant_track_id' => $this->bede->merchantTrackID,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
 
         if (isset($responsejson['PayUrl'])) {
             $this->paymentURL = $responsejson['PayUrl'];
@@ -76,17 +105,6 @@ class CheckoutDataProcessor
         } else {
             $payment->setAdditionalInformation('bede_pay_error', 'Payment gateway did not return a valid URL.');
         }
-    }
-
-    protected function saveLogData(array $data)
-    {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
-        $connection = $resource->getConnection();
-        $tableName = $resource->getTableName('bede_payment_logs');
-
-        $connection->insert($tableName, $data);
     }
 
     public function getPayUrl(): string

@@ -23,6 +23,8 @@ class Bede
 
     public $cartID;
     public $transactionRef;
+    public $logData;
+    public $merchantTrackID;
 
     public function __construct() {}
 
@@ -76,29 +78,19 @@ CURL;
         $logger .= $originalResponse;
         $this->logger = $logger;
 
-        $this->requestLogger = [
-            'type' => 'request',
-            'endpoint' => $path,
-            'method' => ($isPost) ? 'POST' :  'GET',
-            'status' => 200,
-            'order_id' => "-",
-            'transaction_id' => "-",
-            'executed_at' => date('Y-m-d H:i:s'),
-            'curl_command' => $this->curlCommand($url, json_encode($postdata)),
-        ];
-
-        $this->responseLogger = [
-            'type' => 'response',
+        $this->logData = [
+            'type' => 'api-log',
+            'baseurl' => $this->baseURL,
             'endpoint' => $path,
             'method' => ($isPost) ? 'POST' :  'GET',
             'status' => $statusCode,
-            'order_id' => "-",
-            'transaction_id' => "-",
-            'executed_at' => date('Y-m-d H:i:s'),
-            'curl_command' => $originalResponse,
+            'request_data' => json_encode($postdata),
+            'response_data' => $originalResponse,
+            'merchant_track_id' => $this->merchantTrackID
         ];
-        $this->responseLogger['cart_id'] = $this->cartID;
-        $this->responseLogger['transaction_ref'] = $this->transactionRef;
+
+        // $this->responseLogger['cart_id'] = $this->cartID;
+        // $this->responseLogger['transaction_ref'] = $this->transactionRef;
 
         return $originalResponse;
     }
@@ -264,13 +256,15 @@ CURL;
         return $response;
     }
 
-    public function requestLink(BedeBuyer $buyer, $paymentMethod = "knet")
+    public function requestLink(BedeBuyer $buyer, $paymentMethod = "")
     {
         $path = "/pgapi/api/payment/requestLink";
         $generateNumber = $this->generateNumber();
 
         $hashMac = $this->hashing($buyer->trackID, $buyer->amount(), $generateNumber);
         $rawHash = $this->rawHashing($buyer->trackID, $buyer->amount(), $generateNumber);
+
+        $this->merchantTrackID = $buyer->trackID;
 
         $postData = [
             'DBRqst' => 'PY_ECom',

@@ -7,24 +7,41 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Bede\PaymentGateway\Helper\Data;
 use Bede\PaymentGateway\Model\Payment\Bede;
+use Bede\PaymentGateway\Model\Payment\PaymentRepository;
 
 class Response extends Action
 {
     protected $helper;
     protected $bede;
+    protected $paymentRepository;
 
     public function __construct(
         Context $context,
         Data $helper,
-        Bede $bede
+        Bede $bede,
+        PaymentRepository $paymentRepository
     ) {
         parent::__construct($context);
         $this->helper = $helper;
         $this->bede = $bede;
+        $this->paymentRepository = $paymentRepository;
     }
 
     public function execute()
     {
+        $cartID = 0;
+        $amount = 0;
+        $orderID = "";
+        $merchantTxnId = "";
+        $transactionID = "";
+        $paymentID = "";
+        $paymentStatus = "";
+        $bookeyTransactionID = "";
+        $bankReference = "";
+        $paymentMethod = "";
+        $errorCode = 0;
+        $finalStatus = "";
+
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
         // Get parameters from the request
@@ -37,21 +54,7 @@ class Response extends Action
 
         $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
         $connection = $resource->getConnection();
-        $tableName = $resource->getTableName('bede_payment_logs');
-
-        // callback
-        $callbackData = [
-            'type' => 'callback',
-            'endpoint' => "",
-            'method' => 'GET',
-            'status' => 200,
-            'order_id' => "-",
-            'transaction_id' => $transactionID,
-            'executed_at' => date('Y-m-d H:i:s'),
-            'curl_command' => "GET:\n" . json_encode($_GET) . "\n\n" . $rawPostData,
-            'cart_id' => "",
-            'transaction_ref' => $merchantTxnId ?? ""
-        ];
+        $tableName = $resource->getTableName('bede_payments');
 
         $successURL = $this->helper->getSuccessUrl();
         $failureURL = $this->helper->getFailureUrl();
@@ -63,9 +66,6 @@ class Response extends Action
         $order = null;
 
         if ($merchantTxnId && $transactionID) {
-
-            $callbackData['curl_command'] = $callbackData['curl_command'];
-
             $isPaid = false;
             if ($errorCode == 0) {
                 $isPaid = true;
@@ -73,23 +73,23 @@ class Response extends Action
 
             $select = $connection->select()
                 ->from($tableName)
-                ->where('transaction_ref = ?', $merchantTxnId)
+                ->where('merchant_track_id = ?', $merchantTxnId)
                 ->order('id DESC')
                 ->limit(1);
 
             $logEntry = $connection->fetchRow($select);
 
             if ($logEntry && !empty($logEntry['cart_id'])) {
-                $cartId = $logEntry['cart_id'];
-                $callbackData['cart_id'] = $cartId;
+                $cartID = $logEntry['cart_id'];
 
                 $order = $objectManager->create(\Magento\Sales\Model\Order::class)
                     ->getCollection()
-                    ->addFieldToFilter('quote_id', $cartId)
+                    ->addFieldToFilter('quote_id', $cartID)
                     ->getLastItem();
 
                 if ($order->getId()) {
-                    $callbackData['order_id'] = $order->getId();
+                    $amount = $order->getGrandTotal();
+                    $orderID = $order->getId();
                 } else {
                     $isPaid = false;
                 }
@@ -97,30 +97,19 @@ class Response extends Action
 
             // check the payment status
             $response = $this->bede->paymentStatus($merchantTxnId);
-            $responseData = [
-                'type' => 'payment',
-                'endpoint' => "/pgapi/api/payment/paymentstatus",
-                'method' => 'POST',
-                'status' => 200,
-                'order_id' => "-",
-                'transaction_id' => $transactionID,
-                'executed_at' => date('Y-m-d H:i:s'),
-                'curl_command' => $response,
-                'cart_id' => $cartId,
-                'transaction_ref' => $merchantTxnId ?? ""
-            ];
-            $connection->insert($tableName, $responseData);
-
-            $callbackData['curl_command'] .= "\n\n" . $response;
+            $this->paymentRepository->addLog($this->bede->logData);
 
             $jsonResponse = json_decode($response, true);
-            $paymentType = "";
-            $paymentID = "";
-            $processDate = "";
-            $bankReference = "";
+
             if (isset($jsonResponse['PaymentStatus'])) {
                 $dataResponse = $jsonResponse['PaymentStatus'][0];
                 $isPaid = false;
+                $paymentStatus = $dataResponse['finalStatus'] ?? '';
+                $bookeyTransactionID = $dataResponse['BookeeyTrackId'] ?? '';
+                $merchantTxnId = $dataResponse['MerchantTxnRefNo'] ?? '';
+                $errorCode = $dataResponse['ErrorCode'] ?? 0;
+
+
                 if ($dataResponse['ErrorCode'] == 0) {
                     $isPaid = true;
                     $paymentType = $dataResponse['PaymentType'];
@@ -131,16 +120,35 @@ class Response extends Action
             }
         }
 
-        $connection->insert($tableName, $callbackData);
+
+
+        $this->addPaymentData(
+            $cartID,
+            $amount,
+            $orderID,
+            $merchantTxnId,
+            $bookeyTransactionID,
+            $paymentID,
+            $paymentStatus,
+            $bookeyTransactionID,
+            $bankReference,
+            $paymentType,
+            $errorCode,
+            $finalStatus
+        );
 
         if ($isPaid && $order && $order->getId()) {
+
             $order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING)
                 ->setStatus(\Magento\Sales\Model\Order::STATE_PROCESSING);
             // Optionally add a comment
             $order->addStatusHistoryComment('Payment successful via gateway callback.');
 
             $payment = $order->getPayment();
+
             $payment->setTransactionId($transactionID);
+            $payment->setLastTransId($transactionID);
+
             $payment->setIsTransactionClosed(true);
             $payment->addTransaction(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE, null, false);
             $payment->setAdditionalInformation('gateway_transaction_id', $transactionID);
@@ -152,14 +160,14 @@ class Response extends Action
             $order->save();
 
             $successUrlWithParams = $successURL . (strpos($successURL, '?') !== false ? '&' : '?') . http_build_query([
-                'status' => 'success',
-                'order_id' => $order->getIncrementId(),
-                'transaction_id' => $transactionID,
+                // 'status' => 'success',
+                // 'order_id' => $order->getIncrementId(),
+                // 'transaction_id' => $transactionID,
                 'merchant_transaction_id' => $merchantTxnId,
-                'payment_type' => $paymentType,
-                'payment_id' => $paymentID,
-                'bank_reference' => $bankReference,
-                'amount' => $order->getOrderCurrencyCode() . " " . $order->getGrandTotal(),
+                // 'payment_type' => $paymentType,
+                // 'payment_id' => $paymentID,
+                // 'bank_reference' => $bankReference,
+                // 'amount' => $order->getOrderCurrencyCode() . " " . $order->getGrandTotal(),
             ]);
 
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)
@@ -170,7 +178,7 @@ class Response extends Action
             $order->addStatusHistoryComment('Payment failed: ' . $errorMessage);
 
             $payment = $order->getPayment();
-            $payment->setTransactionId($transactionID ?? $merchantTxnId);
+            $payment->setTransactionId($merchantTxnId);
             $payment->setIsTransactionClosed(true);
             $payment->addTransaction(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID, null, false);
             $payment->setAdditionalInformation('error_message', $errorMessage);
@@ -180,11 +188,11 @@ class Response extends Action
             $order->save();
 
             $failureUrlWithParams = $failureURL . (strpos($failureURL, '?') !== false ? '&' : '?') . http_build_query([
-                'status' => 'failure',
-                'order_id' => $order ? $order->getIncrementId() : '',
-                'error_message' => $errorMessage,
-                'error_code' => $errorCode,
-                'transaction_id' => $transactionID ?? "",
+                // 'status' => 'failure',
+                // 'order_id' => $order ? $order->getIncrementId() : '',
+                // 'error_message' => $errorMessage,
+                // 'error_code' => $errorCode,
+                // 'transaction_id' => $transactionID ?? "",
                 'merchant_transaction_id' => $merchantTxnId,
             ]);
 
@@ -193,14 +201,39 @@ class Response extends Action
         }
     }
 
-    protected function saveLogData(array $data)
-    {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    protected function addPaymentData(
+        $cartID,
+        $amount,
+        $orderID,
+        $merchantTxnId,
+        $transactionID,
+        $paymentID,
+        $paymentStatus,
+        $bookeeyTrackID,
+        $bankReference,
+        $paymentMethod,
+        $errorCode,
+        $finalStatus
+    ) {
+        $arr = [
+            'cart_id' => $cartID,
+            'amount' => $amount,
+            'order_id' => $orderID,
+            'merchant_track_id' => $merchantTxnId,
+            'transaction_id' => $transactionID,
+            'payment_id' => $paymentID,
+            'payment_status' => $paymentStatus,
+            'bookeey_track_id' => $bookeeyTrackID,
+            'bank_ref_number' => $bankReference,
+            'payment_method' => $paymentMethod,
+            'error_code' => $errorCode,
+            'final_status' => $finalStatus,
+            'refund_status' => null,
+            'refund_amount' => null,
+            'refund_request' => null,
+            'refund_response' => null,
+        ];
 
-        $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
-        $connection = $resource->getConnection();
-        $tableName = $resource->getTableName('bede_payment_logs');
-
-        $connection->insert($tableName, $data);
+        $this->paymentRepository->updatePaymentData($merchantTxnId, $arr);
     }
 }

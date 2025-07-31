@@ -27,8 +27,7 @@
             <ul class="bede-payment-method" data-bind="foreach: availableMethods()">
                 <li class="bede-payment-method-item" data-bind="css: {selected: $parent.selectedMethod() == code}">
                     <label data-bind="attr: {for: 'method_' + $index()}">
-                        <input type="radio" name="payment[bede_method]"
-                        data-bind="attr: {id: 'method_' + $index(), value: code}, checked: $parent.selectedMethod" />
+                        <input type="radio" name="payment[bede_method]" data-bind="attr: {id: 'method_' + $index(), value: code}, checked: $parent.selectedMethod" />
                         <span data-bind="text: title"></span>
                         <!-- ko if: logo -->
                         <img data-bind="attr: {src: logo}" width="50" />

@@ -51,6 +51,16 @@ define([
             return true;
         },
 
+        // selectPaymentMethod: function () {
+        //     var result = this._super();
+            
+        //     if (!this.availableMethods().length) {
+        //         this.loadPaymentMethods();
+        //     }
+            
+        //     return result;
+        // },
+
         loadPaymentMethods: function () {
             var self = this;
             var serviceUrl = url.build('bede_paymentgateway/payment/methods');
@@ -73,6 +83,17 @@ define([
             return true;
         },
 
+        // onSubMethodChange: function(data, event) {
+        //     // This is called when user changes sub-payment method
+        //     var selectedValue = event.target.value;
+        //     this.selectedMethod(selectedValue);
+            
+        //     // Don't call any API here - just update the selection
+        //     console.log('Sub-method selected:', selectedValue);
+            
+        //     return true;
+        // },
+
         getData: function () {
             return {
                 'method': this.item.method,
@@ -82,8 +103,25 @@ define([
             };
         },
 
+        // validate: function() {
+        //     var result = this._super();
+            
+        //     if (!this.selectedMethod()) {
+        //         alert('Please select a payment method.');
+        //         return false;
+        //     }
+            
+        //     return result;
+        // },
+
         placeOrder: function (data, event) {
             var item = this;
+
+            if (self.isPlaceOrderActionAllowed() === false) {
+                return false;
+            }
+
+            self.isPlaceOrderActionAllowed(false);
 
             if(item.payUrlRequested) {
                 return item._super(data, event);

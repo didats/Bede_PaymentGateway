@@ -70,9 +70,11 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
         }
 
         $payment = $this->getInfoInstance();
-        $selectedSubmethod = $payment->getAdditionalInformation('selected_submethod') ?? "knet";
+        $selectedSubmethod = $payment->getAdditionalInformation('selected_submethod') ?? "";
+        if ($selectedSubmethod != "") {
+            $this->checkoutDataProcessor->process($payment, $selectedSubmethod);
+        }
 
-        $this->checkoutDataProcessor->process($payment, $selectedSubmethod);
 
         return $this;
     }
