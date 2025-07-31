@@ -243,6 +243,8 @@ CURL;
         $hashInput = $this->merchantID . '|' . $this->secretKey;
         $hashMac = hash('sha512', $hashInput);
 
+        $this->merchantTrackID = $transactionID;
+
         $data = [
             'Mid' => $this->merchantID,
             'MerchantTxnRefNo' => [
@@ -319,9 +321,10 @@ CURL;
         return $response;
     }
 
-    public function requestRefund($bookeyTrackID, $merchantTrackID)
+    public function requestRefund($bookeyTrackID, $merchantTrackID, $amount)
     {
-        $arr = [
+        $path = "/bkycoreapi/v1/Accounts/request-refund";
+        $postData = [
             "Do_Appinfo" =>  [
                 "APPID" =>  "ACNTS",
                 "MdlID" =>  "Refnd",
@@ -345,7 +348,46 @@ CURL;
                 "Remark" =>  null,
                 "MerUID" =>  $this->merchantID
             ],
-            "DBRqst" =>  "ReFnd_Sts"
+            "DBRqst" =>  "Req_New"
         ];
+
+        $this->requestData = $postData;
+        $response = $this->exec($path, $postData);
+        return $response;
+    }
+
+    public function cancelRefund($bookeyTrackID, $merchantTrackID, $amount)
+    {
+        $path = "/bkycoreapi/v1/Accounts/request-refund";
+        $postData = [
+            "Do_Appinfo" =>  [
+                "APPID" =>  "ACNTS",
+                "MdlID" =>  "Refnd",
+                "AppLicens" => "s",
+                'AppTyp' => $this->moduleName,
+                'AppVer' => $this->moduleVersion,
+                'ApiVer' => '0.61',
+                'IPAddrs' => $this->IPAddress(),
+                'Country' => 'Kuwait',
+            ],
+            "Do_UsrAuth" =>  [
+                "AuthTyp" =>  "5",
+                "UsrSessnUID" =>  ""
+            ],
+            "Do_ReFndDtl" =>  [
+                "BkyTrackUID" =>  $bookeyTrackID,
+                "MerchRefNo" =>  $merchantTrackID,
+                "RefndTo" =>  "CST",
+                "ProsStatCD" =>  5,
+                "Refnd_AMT" =>  $amount,
+                "Remark" =>  null,
+                "MerUID" =>  $this->merchantID
+            ],
+            "DBRqst" =>  "ReFnd_Req"
+        ];
+
+        $this->requestData = $postData;
+        $response = $this->exec($path, $postData);
+        return $response;
     }
 }

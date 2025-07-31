@@ -31,6 +31,8 @@
         <column xsi:type="varchar" name="transaction_id" length="255" nullable="true" comment="Transaction ID"/>
         <column xsi:type="varchar" name="payment_id" length="255" nullable="true" comment="Payment ID"/>
         <column xsi:type="varchar" name="payment_status" length="100" nullable="true" comment="Payment Status"/>
+        <column xsi:type="varchar" name="order_status" length="100" nullable="true" comment="Order Status"/>
+        <column xsi:type="varchar" name="order_state" length="100" nullable="true" comment="Order State"/>
         <column xsi:type="varchar" name="bookeey_track_id" length="255" nullable="true" comment="Bookeey Track ID"/>
         <column xsi:type="varchar" name="bank_ref_number" length="255" nullable="true" comment="Bank Reference Number"/>
         <column xsi:type="varchar" name="payment_method" length="255" nullable="true" comment="Payment Method"/>
@@ -74,6 +76,9 @@
         </index>
         <index referenceId="BEDE_PAYMENTS_PAYMENT_STATUS" indexType="btree">
             <column name="payment_status"/>
+        </index>
+        <index referenceId="BEDE_PAYMENTS_ORDER_STATUS" indexType="btree">
+            <column name="order_status"/>
         </index>
         <index referenceId="BEDE_PAYMENTS_REFUND_STATUS" indexType="btree">
             <column name="refund_status"/>

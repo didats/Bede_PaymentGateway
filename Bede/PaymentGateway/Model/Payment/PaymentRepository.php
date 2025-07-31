@@ -181,4 +181,14 @@ class PaymentRepository
             return null;
         }
     }
+
+    public function getConnection()
+    {
+        return $this->resourceConnection->getConnection();
+    }
+
+    public function getTableName($tableName)
+    {
+        return $this->resourceConnection->getTableName($tableName);
+    }
 }

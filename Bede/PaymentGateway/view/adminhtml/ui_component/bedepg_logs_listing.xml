@@ -68,6 +68,13 @@
 				<filter>text</filter>
 				<sorting>desc</sorting>
 				<label translate="true">ID</label>
+				
+			</settings>
+		</column>
+		<column name="merchant_track_id">
+			<settings>
+				<filter>text</filter>
+				<label translate="true">Merchant Track ID</label>
 			</settings>
 		</column>
 		<column name="type">
@@ -95,34 +102,27 @@
 				<label translate="true">Status</label>
 			</settings>
 		</column>
-		<column name="order_id">
-			<settings>
-				<filter>text</filter>
-				<label translate="true">Order ID</label>
-			</settings>
-		</column>
-		<column name="transaction_id">
-			<settings>
-				<filter>text</filter>
-				<label translate="true">Transaction ID</label>
-			</settings>
-		</column>
-		<column name="executed_at">
+		
+		<column name="created_at">
 			<settings>
 				<filter>text</filter>
 				<label translate="true">Executed At</label>
 			</settings>
 		</column>
-		<column name="curl_command">
+		<column name="request_data" class="Bede\PaymentGateway\Ui\Component\Listing\Column\JsonData">
 			<settings>
-				<filter>text</filter>
-				<label translate="true">cURL Command</label>
+				<filter>false</filter>
+        		<sortable>false</sortable>
+				<label translate="true">Request Data</label>
+				<bodyTmpl>ui/grid/cells/html</bodyTmpl>
 			</settings>
 		</column>
-		<column name="created_at">
+		<column name="response_data" class="Bede\PaymentGateway\Ui\Component\Listing\Column\JsonData">
 			<settings>
-				<filter>text</filter>
-				<label translate="true">Created At</label>
+				<filter>false</filter>
+        		<sortable>false</sortable>
+				<label translate="true">Response Data</label>
+				<bodyTmpl>ui/grid/cells/html</bodyTmpl>
 			</settings>
 		</column>
 	</columns>

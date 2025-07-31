@@ -22,7 +22,7 @@ class Index extends Action
     {
         $resultPage = $this->pageFactory->create();
         $resultPage->setActiveMenu('Bede_PaymentGateway::refund');
-        $resultPage->getConfig()->getTitle()->prepend(__('Refund Management'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Refund'));
 
         return $resultPage;
     }

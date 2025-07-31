@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    
+    <!-- Listen for order status changes -->
+    <event name="sales_order_save_after">
+        <observer name="bede_order_status_change" instance="Bede\PaymentGateway\Observer\OrderStatusChange" />
+    </event>
+    
+</config>

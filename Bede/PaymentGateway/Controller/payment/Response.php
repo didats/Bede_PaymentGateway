@@ -41,6 +41,8 @@ class Response extends Action
         $paymentMethod = "";
         $errorCode = 0;
         $finalStatus = "";
+        $orderStatus = "pending";
+        $orderState = "pending";
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
@@ -90,6 +92,8 @@ class Response extends Action
                 if ($order->getId()) {
                     $amount = $order->getGrandTotal();
                     $orderID = $order->getId();
+                    $orderStatus = $order->getStatusLabel(); // Get the current order status
+                    $orderState = $order->getState(); // Get the current order state
                 } else {
                     $isPaid = false;
                 }
@@ -134,7 +138,9 @@ class Response extends Action
             $bankReference,
             $paymentType,
             $errorCode,
-            $finalStatus
+            $finalStatus,
+            $orderStatus,
+            $orderState
         );
 
         if ($isPaid && $order && $order->getId()) {
@@ -213,7 +219,9 @@ class Response extends Action
         $bankReference,
         $paymentMethod,
         $errorCode,
-        $finalStatus
+        $finalStatus,
+        $orderStatus,
+        $orderState
     ) {
         $arr = [
             'cart_id' => $cartID,
@@ -228,6 +236,8 @@ class Response extends Action
             'payment_method' => $paymentMethod,
             'error_code' => $errorCode,
             'final_status' => $finalStatus,
+            'order_status' => $orderStatus,
+            'order_state' => $orderState,
             'refund_status' => null,
             'refund_amount' => null,
             'refund_request' => null,

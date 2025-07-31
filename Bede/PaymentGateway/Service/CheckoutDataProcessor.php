@@ -96,7 +96,9 @@ class CheckoutDataProcessor
             'amount' => $grandTotal,
             'merchant_track_id' => $this->bede->merchantTrackID,
             'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'updated_at' => date('Y-m-d H:i:s'),
+            'order_status' => 'pending',
+            'order_state' => 'pending'
         ]);
 
         if (isset($responsejson['PayUrl'])) {

@@ -5,21 +5,21 @@ namespace Bede\PaymentGateway\Controller\Adminhtml\Refund;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Framework\App\ResourceConnection;
 
 class Search extends Action
 {
     protected $jsonFactory;
-    protected $orderCollectionFactory;
+    protected $resourceConnection;
 
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,
-        CollectionFactory $orderCollectionFactory
+        ResourceConnection $resourceConnection
     ) {
         parent::__construct($context);
         $this->jsonFactory = $jsonFactory;
-        $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->resourceConnection = $resourceConnection;
     }
 
     public function execute()
@@ -28,10 +28,11 @@ class Search extends Action
         $result = $this->jsonFactory->create();
 
         try {
-            $orders = $this->searchOrders($params);
+            $payments = $this->searchPayments($params);
             return $result->setData([
                 'success' => true,
-                'orders' => $orders
+                'payments' => $payments,
+                'count' => count($payments)
             ]);
         } catch (\Exception $e) {
             return $result->setData([
@@ -41,65 +42,85 @@ class Search extends Action
         }
     }
 
-    private function searchOrders($params)
+    private function searchPayments($params)
     {
-        $collection = $this->orderCollectionFactory->create();
+        $connection = $this->resourceConnection->getConnection();
+        $tableName = $this->resourceConnection->getTableName('bede_payments');
 
-        // Join with payment table to get transaction info
-        $collection->getSelect()->joinLeft(
-            ['payment' => $collection->getTable('sales_order_payment')],
-            'main_table.entity_id = payment.parent_id',
-            ['last_trans_id']
-        );
+        $select = $connection->select()
+            ->from(['bp' => $tableName]);
 
-        // Apply filters
-        if (!empty($params['order_id'])) {
-            $collection->addFieldToFilter('increment_id', ['like' => '%' . $params['order_id'] . '%']);
+        // Apply filters - Only search within bede_payments table
+        if (!empty($params['merchant_track_id'])) {
+            $select->where('bp.merchant_track_id LIKE ?', '%' . $params['merchant_track_id'] . '%');
         }
 
         if (!empty($params['transaction_id'])) {
-            $collection->addFieldToFilter('payment.last_trans_id', ['like' => '%' . $params['transaction_id'] . '%']);
+            $select->where('bp.transaction_id LIKE ?', '%' . $params['transaction_id'] . '%');
         }
 
         if (!empty($params['order_status'])) {
-            $collection->addFieldToFilter('status', $params['order_status']);
+            $select->where('bp.order_status = ?', $params['order_status']);
         }
 
         if (!empty($params['date_from'])) {
-            $collection->addFieldToFilter('created_at', ['gteq' => $params['date_from'] . ' 00:00:00']);
+            $select->where('bp.created_at >= ?', $params['date_from'] . ' 00:00:00');
         }
 
         if (!empty($params['date_to'])) {
-            $collection->addFieldToFilter('created_at', ['lteq' => $params['date_to'] . ' 23:59:59']);
+            $select->where('bp.created_at <= ?', $params['date_to'] . ' 23:59:59');
         }
 
-        // Only get orders with Bede payment method
-        $collection->getSelect()->joinLeft(
-            ['bede_logs' => $collection->getTable('bede_payment_logs')],
-            'main_table.quote_id = bede_logs.cart_id',
-            ['bede_transaction_ref' => 'bede_logs.transaction_ref']
-        );
-        $collection->addFieldToFilter('bede_logs.transaction_ref', ['notnull' => true]);
+        // Order by created date descending
+        $select->order('bp.created_at DESC')
+            ->limit(100); // Limit results
 
-        $collection->setPageSize(50);
+        $results = $connection->fetchAll($select);
 
-        $orders = [];
-        foreach ($collection as $order) {
-            $orders[] = [
-                'entity_id' => $order->getId(),
-                'increment_id' => $order->getIncrementId(),
-                'status' => $order->getStatus(),
-                'grand_total' => $order->getGrandTotal(),
-                'currency_code' => $order->getOrderCurrencyCode(),
-                'created_at' => $order->getCreatedAt(),
-                'customer_name' => $order->getCustomerFirstname() . ' ' . $order->getCustomerLastname(),
-                'transaction_id' => $order->getLastTransId(),
-                'bede_transaction_ref' => $order->getBedeTransactionRef(),
-                'can_refund' => $order->canCreditmemo()
+        $payments = [];
+        foreach ($results as $row) {
+            $canRefund = $this->canRefundPayment($row);
+
+            $payments[] = [
+                'id' => $row['id'],
+                'cart_id' => $row['cart_id'] ?: 'N/A',
+                'order_id' => $row['order_id'] ?: 'N/A',
+                'merchant_track_id' => $row['merchant_track_id'],
+                'transaction_id' => $row['transaction_id'] ?: 'N/A',
+                'amount' => number_format($row['amount'], 2),
+                'payment_status' => $row['payment_status'],
+                'order_status' => $row['order_status'],
+                'final_status' => $row['final_status'] ?: 'N/A',
+                'payment_method' => $row['payment_method'] ?: 'N/A',
+                'payment_id' => $row['payment_id'] ?: 'N/A',
+                'bank_ref_number' => $row['bank_ref_number'] ?: 'N/A',
+                'bookeey_track_id' => $row['bookeey_track_id'] ?: 'N/A',
+                'error_code' => $row['error_code'] ?: 'N/A',
+                'created_at' => $row['created_at'],
+                'updated_at' => $row['updated_at'],
+                'can_refund' => $canRefund,
+                'refund_status' => $row['refund_status'] ?? null,
+                'refund_amount' => $row['refund_amount'] ? number_format($row['refund_amount'], 2) : null
             ];
         }
 
-        return $orders;
+        return $payments;
+    }
+
+    private function canRefundPayment($paymentData)
+    {
+        // Check if payment is completed and not already fully refunded
+        if ($paymentData['payment_status'] !== 'completed') {
+            return false;
+        }
+
+        // Check if already refunded
+        if (isset($paymentData['refund_status']) && $paymentData['refund_status'] === 'completed') {
+            return false;
+        }
+
+        // Additional checks can be added here
+        return true;
     }
 
     protected function _isAllowed()
