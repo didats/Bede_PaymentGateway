@@ -51,15 +51,15 @@ define([
             return true;
         },
 
-        // selectPaymentMethod: function () {
-        //     var result = this._super();
+        selectPaymentMethod: function () {
+            var result = this._super();
             
-        //     if (!this.availableMethods().length) {
-        //         this.loadPaymentMethods();
-        //     }
+            if (!this.availableMethods().length) {
+                this.loadPaymentMethods();
+            }
             
-        //     return result;
-        // },
+            return result;
+        },
 
         loadPaymentMethods: function () {
             var self = this;
@@ -103,29 +103,34 @@ define([
             };
         },
 
-        // validate: function() {
-        //     var result = this._super();
+        validate: function() {
+            var result = this._super();
             
-        //     if (!this.selectedMethod()) {
-        //         alert('Please select a payment method.');
-        //         return false;
-        //     }
+            if (!this.selectedMethod()) {
+                alert('Please select a payment method.');
+                return false;
+            }
             
-        //     return result;
-        // },
+            return result;
+        },
 
         placeOrder: function (data, event) {
             var item = this;
 
-            if (self.isPlaceOrderActionAllowed() === false) {
-                return false;
-            }
+            // if(item.isPlaceOrderActionAllowed() == undefined) {
+            // } else {
+            //     if (item.isPlaceOrderActionAllowed() === false) {
+            //         return false;
+            //     }
+            // }
 
-            self.isPlaceOrderActionAllowed(false);
+            item.isPlaceOrderActionAllowed(true);
 
             if(item.payUrlRequested) {
+                console.log("Goes here 1");
                 return item._super(data, event);
             } else {
+                console.log("Goes here 2");
                 if (item.validate() && item.isPlaceOrderActionAllowed() === true) {
                     fullScreenLoader.startLoader();
                     var serviceUrl = url.build('bede_paymentgateway/payment/getpayurl');

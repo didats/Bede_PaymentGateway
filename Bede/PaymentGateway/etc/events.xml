@@ -5,5 +5,5 @@
     <event name="sales_order_save_after">
         <observer name="bede_order_status_change" instance="Bede\PaymentGateway\Observer\OrderStatusChange" />
     </event>
-    
+    <!-- TestObserver moved to frontend/events.xml -->
 </config>

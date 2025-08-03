@@ -25,56 +25,103 @@ class InjectPaymentInfoResponse implements ObserverInterface
         $this->logger = $logger;
     }
 
-    public function execute(Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        /** @var \Magento\Framework\App\Response\Http $response */
-        $response = $observer->getEvent()->getResponse();
 
-        /** @var \Magento\Framework\App\Request\Http $request */
-        $request = $observer->getEvent()->getRequest();
+        // For layout_render_before event, get the layout and request
+        $layout = $observer->getEvent()->getLayout();
+
+        // If layout is not in the event, try to get it from observer data
+        if (!$layout) {
+            $layout = $observer->getEvent()->getData('layout');
+        }
+
+        // If still no layout, try getting from ObjectManager
+        if (!$layout) {
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $layout = $objectManager->get(\Magento\Framework\View\LayoutInterface::class);
+        }
+
+        // Get request from ObjectManager since it might not be in the event
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $request = $objectManager->get(\Magento\Framework\App\Request\Http::class);
+
+        if (!$request) {
+            return;
+        }
 
         $successUrl = $this->helper->getSuccessUrl();
         $failureUrl = $this->helper->getFailureUrl();
 
         // Extract the path from the URLs
-        $successPath = parse_url($successUrl, PHP_URL_PATH);
-        $failurePath = parse_url($failureUrl, PHP_URL_PATH);
-        $currentPath = parse_url($request->getRequestUri(), PHP_URL_PATH);
+        $successPath = rtrim(parse_url($successUrl, PHP_URL_PATH), '/');
+        $failurePath = rtrim(parse_url($failureUrl, PHP_URL_PATH), '/');
+        $currentPath = rtrim(parse_url($request->getRequestUri(), PHP_URL_PATH), '/');
 
-        if ($currentPath === $successPath || $currentPath === $failurePath) {
+        $isSuccessOrFailurePage = ($currentPath === $successPath || $currentPath === $failurePath);
+
+        if ($isSuccessOrFailurePage) {
             $merchantTxnId = $request->getParam('merchant_transaction_id');
 
             // Fetch payment data from database
             $paymentData = null;
             if ($merchantTxnId) {
-                $paymentData = $this->paymentRepository->getPaymentByMerchantTrackId($merchantTxnId);
+                try {
+                    $paymentData = $this->paymentRepository->getPaymentByMerchantTrackId($merchantTxnId);
+                } catch (\Exception $e) {
+                    // Log error if needed
+                }
             }
 
             // Generate the payment info HTML
             $paymentHtml = $this->generatePaymentInfoHtml($request, $paymentData, ($currentPath === $successPath));
 
-            // Get the current response body
-            $body = $response->getBody();
+            if ($layout) {
+                // Try to add a block to the layout
+                try {
+                    // Create a text block with our payment HTML
+                    $block = $layout->createBlock(\Magento\Framework\View\Element\Text::class, 'bede_payment_info');
+                    $block->setText($paymentHtml);
 
-            // Inject the payment info after the opening <body> tag or at the beginning of content
-            if (strpos($body, '<div class="page-wrapper">') !== false) {
-                $body = str_replace(
-                    '<div class="page-wrapper">',
-                    '<div class="page-wrapper">' . $paymentHtml,
-                    $body
-                );
-            } elseif (strpos($body, '<main ') !== false) {
-                $body = preg_replace(
-                    '/(<main [^>]*>)/',
-                    '$1' . $paymentHtml,
-                    $body
-                );
+                    // Try to add it to the content area or main content
+                    if ($layout->getBlock('content')) {
+                        $layout->getBlock('content')->insert($block, '', false, 'bede_payment_info');
+                    } elseif ($layout->getBlock('main')) {
+                        $layout->getBlock('main')->insert($block, '', false, 'bede_payment_info');
+                    } elseif ($layout->getBlock('page.wrapper')) {
+                        $layout->getBlock('page.wrapper')->insert($block, '', false, 'bede_payment_info');
+                    } else {
+                        // Try to inject using JavaScript after the CMS content
+                        echo '<script>document.addEventListener("DOMContentLoaded", function() { 
+                            var targets = [
+                                "#maincontent .column.main",
+                                ".cms-page-view .column.main", 
+                                ".column.main",
+                                ".cms-page-view .page-main",
+                                ".page-main .cms-content",
+                                ".page-main",
+                                ".main-content",
+                                ".content-wrapper",
+                                ".page-wrapper .main"
+                            ];
+                            
+                            for (var i = 0; i < targets.length; i++) {
+                                var content = document.querySelector(targets[i]);
+                                if (content) {
+                                    content.insertAdjacentHTML("beforeend", ' . json_encode($paymentHtml) . ');
+                                    break;
+                                }
+                            }
+                        });</script>';
+                    }
+                } catch (\Exception $e) {
+                    // Fallback to direct output
+                    echo $paymentHtml;
+                }
             } else {
-                // Fallback: inject after <body> tag
-                $body = str_replace('<body', $paymentHtml . '<body', $body);
+                // Direct output as fallback
+                echo $paymentHtml;
             }
-
-            $response->setBody($body);
         }
     }
 
@@ -111,7 +158,7 @@ class InjectPaymentInfoResponse implements ObserverInterface
             $updatedAt = $paymentData['updated_at'];
         }
 
-        $html = '<div class="bede-payment-info">';
+        $html = '<div class="bede-payment-info" style="margin-top: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">';
 
         if ($isSuccess) {
             $html .= '<h3>Payment Successful!</h3>';

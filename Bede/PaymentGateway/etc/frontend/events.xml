@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="http_response_send_before">
+    <event name="layout_render_before">
         <observer name="bede_inject_payment_info_response" instance="Bede\PaymentGateway\Observer\InjectPaymentInfoResponse" />
     </event>
 </config>
