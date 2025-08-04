@@ -68,21 +68,23 @@ class Request extends Action
             $response = $bede->requestRefund($bookeyTrackId, $merchantTrackId, $amount);
 
             // Log the request
-            $this->logRefundRequest($paymentId, $response, $merchantTrackId, $resourceConnection, $bede);
+            $connection = $resourceConnection->getConnection();
+            $tableName = $resourceConnection->getTableName('bede_payment_logs');
+            $connection->insert($tableName, $bede->logData);
 
             $jsonResponse = json_decode($response, true);
 
-            if ($jsonResponse && isset($jsonResponse['StatusCD']) && $jsonResponse['StatusCD'] === 0) {
+            if ($jsonResponse && isset($jsonResponse['data']) && $jsonResponse['isSuccess'] === true) {
                 // Update payment record
-                $this->updatePaymentRefundStatus($paymentId, 'requested', $resourceConnection, $amount, $response);
+                $this->updatePaymentRefundStatus($paymentId, 'Requested', $resourceConnection, $amount, $response, $bede->logData);
 
                 return $result->setData([
                     'success' => true,
-                    'message' => __('Refund request submitted successfully. Reference: %1', $jsonResponse['RefNo'] ?? 'N/A')
+                    'message' => $jsonResponse['message'] ?? __('Refund request submitted successfully.')
                 ]);
             } else {
                 $errorMessage = $jsonResponse['ErrMsg'] ?? 'Unknown error occurred';
-                $this->updatePaymentRefundStatus($paymentId, 'failed', $resourceConnection, null, $response);
+                $this->updatePaymentRefundStatus($paymentId, 'Failed', $resourceConnection, $amount, $response, $bede->logData);
 
                 return $result->setData([
                     'success' => false,
@@ -112,7 +114,7 @@ class Request extends Action
         return $connection->fetchRow($select);
     }
 
-    private function updatePaymentRefundStatus($paymentId, $status, $resourceConnection, $amount = null, $response = null)
+    private function updatePaymentRefundStatus($paymentId, $status, $resourceConnection, $amount = null, $response = null, $request = null)
     {
         $connection = $resourceConnection->getConnection();
         $tableName = $resourceConnection->getTableName('bede_payments');
@@ -130,30 +132,15 @@ class Request extends Action
             $updateData['refund_response'] = $response;
         }
 
+        if ($request) {
+            $updateData['refund_request'] = json_encode($request);
+        }
+
         $connection->update(
             $tableName,
             $updateData,
             ['id = ?' => $paymentId]
         );
-    }
-
-    private function logRefundRequest($paymentId, $response, $merchantTrackId, $resourceConnection, $bede)
-    {
-        $connection = $resourceConnection->getConnection();
-        $tableName = $resourceConnection->getTableName('bede_payment_logs');
-
-        $logData = [
-            'type' => 'refund-request',
-            'endpoint' => '/bkycoreapi/v1/Accounts/request-refund',
-            'method' => 'POST',
-            'status' => 200,
-            'request_data' => json_encode($bede->requestData ?? []),
-            'response_data' => $response,
-            'merchant_track_id' => $merchantTrackId,
-            'created_at' => date('Y-m-d H:i:s')
-        ];
-
-        $connection->insert($tableName, $logData);
     }
 
     protected function _isAllowed()

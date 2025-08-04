@@ -70,6 +70,7 @@ class CheckoutDataProcessor
 
         $this->bede->merchantID = $this->helper->getMerchantId();
         $this->bede->secretKey = $this->helper->getSecretKey();
+        $this->bede->baseURL = $this->helper->getBaseUrl();
         $this->bede->successURL = $successURL;
         $this->bede->failureURL = $failureURL;
         $this->bede->subMerchantID = $this->helper->getSubmerchantUid();

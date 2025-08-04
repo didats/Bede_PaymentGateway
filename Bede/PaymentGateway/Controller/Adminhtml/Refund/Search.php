@@ -100,6 +100,7 @@ class Search extends Action
                 'updated_at' => $row['updated_at'],
                 'can_refund' => $canRefund,
                 'refund_status' => $row['refund_status'] ?? null,
+                'refund_request' => $row['refund_request'] ?? "",
                 'refund_amount' => $row['refund_amount'] ? number_format($row['refund_amount'], 2) : null
             ];
         }

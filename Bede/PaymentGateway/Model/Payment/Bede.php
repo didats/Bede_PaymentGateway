@@ -78,13 +78,17 @@ CURL;
         $logger .= $originalResponse;
         $this->logger = $logger;
 
+        $requestData = ($isPost) ? 'POST' :  'GET';
+        $requestData .= " " . $url . "\n";
+        $requestData .= json_encode($postdata);
+
         $this->logData = [
             'type' => 'api-log',
             'baseurl' => $this->baseURL,
             'endpoint' => $path,
             'method' => ($isPost) ? 'POST' :  'GET',
             'status' => $statusCode,
-            'request_data' => json_encode($postdata),
+            'request_data' => $requestData,
             'response_data' => $originalResponse,
             'merchant_track_id' => $this->merchantTrackID
         ];

@@ -18,6 +18,7 @@ class MethodList
         $this->paymentRepository = $paymentRepository;
 
         $this->bede = new Bede();
+        $this->bede->baseURL = $helper->getBaseUrl();
         $this->bede->merchantID = $helper->getMerchantId();
         $this->bede->secretKey = $helper->getSecretKey();
         $this->bede->successURL = $helper->getSuccessUrl();
