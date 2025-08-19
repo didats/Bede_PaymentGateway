@@ -50,49 +50,50 @@ class InjectPaymentInfoResponse implements ObserverInterface
             return;
         }
 
-        $successUrl = $this->helper->getSuccessUrl();
-        $failureUrl = $this->helper->getFailureUrl();
+        $successUrl = $this->helper->getSuccessUrl() ?? "";
+        $failureUrl = $this->helper->getFailureUrl() ?? "";
 
-        // Extract the path from the URLs
-        $successPath = rtrim(parse_url($successUrl, PHP_URL_PATH), '/');
-        $failurePath = rtrim(parse_url($failureUrl, PHP_URL_PATH), '/');
-        $currentPath = rtrim(parse_url($request->getRequestUri(), PHP_URL_PATH), '/');
+        if ($successUrl != "" && $failureUrl != "") {
+            // Extract the path from the URLs
+            $successPath = rtrim(parse_url($successUrl, PHP_URL_PATH), '/');
+            $failurePath = rtrim(parse_url($failureUrl, PHP_URL_PATH), '/');
+            $currentPath = rtrim(parse_url($request->getRequestUri(), PHP_URL_PATH), '/');
 
-        $isSuccessOrFailurePage = ($currentPath === $successPath || $currentPath === $failurePath);
+            $isSuccessOrFailurePage = ($currentPath === $successPath || $currentPath === $failurePath);
 
-        if ($isSuccessOrFailurePage) {
-            $merchantTxnId = $request->getParam('merchant_transaction_id');
+            if ($isSuccessOrFailurePage) {
+                $merchantTxnId = $request->getParam('merchant_transaction_id');
 
-            // Fetch payment data from database
-            $paymentData = null;
-            if ($merchantTxnId) {
-                try {
-                    $paymentData = $this->paymentRepository->getPaymentByMerchantTrackId($merchantTxnId);
-                } catch (\Exception $e) {
-                    // Log error if needed
+                // Fetch payment data from database
+                $paymentData = null;
+                if ($merchantTxnId) {
+                    try {
+                        $paymentData = $this->paymentRepository->getPaymentByMerchantTrackId($merchantTxnId);
+                    } catch (\Exception $e) {
+                        // Log error if needed
+                    }
                 }
-            }
 
-            // Generate the payment info HTML
-            $paymentHtml = $this->generatePaymentInfoHtml($request, $paymentData, ($currentPath === $successPath));
+                // Generate the payment info HTML
+                $paymentHtml = $this->generatePaymentInfoHtml($request, $paymentData, ($currentPath === $successPath));
 
-            if ($layout) {
-                // Try to add a block to the layout
-                try {
-                    // Create a text block with our payment HTML
-                    $block = $layout->createBlock(\Magento\Framework\View\Element\Text::class, 'bede_payment_info');
-                    $block->setText($paymentHtml);
+                if ($layout) {
+                    // Try to add a block to the layout
+                    try {
+                        // Create a text block with our payment HTML
+                        $block = $layout->createBlock(\Magento\Framework\View\Element\Text::class, 'bede_payment_info');
+                        $block->setText($paymentHtml);
 
-                    // Try to add it to the content area or main content
-                    if ($layout->getBlock('content')) {
-                        $layout->getBlock('content')->insert($block, '', false, 'bede_payment_info');
-                    } elseif ($layout->getBlock('main')) {
-                        $layout->getBlock('main')->insert($block, '', false, 'bede_payment_info');
-                    } elseif ($layout->getBlock('page.wrapper')) {
-                        $layout->getBlock('page.wrapper')->insert($block, '', false, 'bede_payment_info');
-                    } else {
-                        // Try to inject using JavaScript after the CMS content
-                        echo '<script>document.addEventListener("DOMContentLoaded", function() { 
+                        // Try to add it to the content area or main content
+                        if ($layout->getBlock('content')) {
+                            $layout->getBlock('content')->insert($block, '', false, 'bede_payment_info');
+                        } elseif ($layout->getBlock('main')) {
+                            $layout->getBlock('main')->insert($block, '', false, 'bede_payment_info');
+                        } elseif ($layout->getBlock('page.wrapper')) {
+                            $layout->getBlock('page.wrapper')->insert($block, '', false, 'bede_payment_info');
+                        } else {
+                            // Try to inject using JavaScript after the CMS content
+                            echo '<script>document.addEventListener("DOMContentLoaded", function() { 
                             var targets = [
                                 "#maincontent .column.main",
                                 ".cms-page-view .column.main", 
@@ -113,14 +114,15 @@ class InjectPaymentInfoResponse implements ObserverInterface
                                 }
                             }
                         });</script>';
+                        }
+                    } catch (\Exception $e) {
+                        // Fallback to direct output
+                        echo $paymentHtml;
                     }
-                } catch (\Exception $e) {
-                    // Fallback to direct output
+                } else {
+                    // Direct output as fallback
                     echo $paymentHtml;
                 }
-            } else {
-                // Direct output as fallback
-                echo $paymentHtml;
             }
         }
     }

@@ -84,6 +84,24 @@ define([
                                 'style="background: #B22222; color: #FFF; margin-left: 5px;">' + 
                                 $t('Request Refund') + '</a>';
                         }
+
+                        actions += "&nbsp;|&nbsp;";
+                        actions += '<a href="#" class="action-default refund-status-btn" ' +
+                                'data-payment-id="' + payment.id + '" ' +
+                                'data-bookeey-track-id="' + (payment.bookeey_track_id || '') + '" ' +
+                                'data-merchant-track-id="' + payment.merchant_track_id + '" ' +
+                                'style="background: #535353; color: #FFF; margin-left: 5px;">' + 
+                                $t('Check Status') + '</a>';
+                        
+                        if(payment.refund_status.toLowerCase() == "pending") {
+                            actions += "&nbsp;|&nbsp;";
+                            actions += '<a href="#" class="action-default refund-cancel-btn" ' +
+                                'data-payment-id="' + payment.id + '" ' +
+                                'data-bookeey-track-id="' + (payment.bookeey_track_id || '') + '" ' +
+                                'data-merchant-track-id="' + payment.merchant_track_id + '" ' +
+                                'style="background: #990000; color: #FFF; margin-left: 5px;">' +
+                                $t('Cancel Refund') + '</a>';
+                        }
                     }
 
                     var statusClass = '';
@@ -137,6 +155,116 @@ define([
                     confirm: function() {
                         processRefund(paymentId);
                     }
+                }
+            });
+        });
+
+        $(document).on('click', '.refund-status-btn', function(e) {
+            e.preventDefault();
+            
+            var paymentId = $(this).data('payment-id');
+            var bookeyTrackId = $(this).data('bookeey-track-id');
+            var merchantTrackId = $(this).data('merchant-track-id');
+            
+            $('a[data-payment-id="' + paymentId + '"].refund-status-btn')
+                        .css('opacity', '0.5')
+                        .text($t('Checking...'));
+            $.ajax({
+                url: config.requestRefundUrl,
+                type: 'GET',
+                data: {
+                    payment_id: paymentId,
+                    bookeey_track_id: bookeyTrackId,
+                    merchant_track_id: merchantTrackId,
+                    check_status: true
+                },
+                success: function(response) {
+                    console.log("Response:", response); 
+                    if (response.success) {
+                        alert({
+                            title: $t('Success'),
+                            content: $t('Status updated successfully.'),
+                            actions: {
+                                always: function() {
+                                    // Refresh search results
+                                    performSearch();
+                                }
+                            }
+                        });
+                    } else {
+                        alert({
+                            title: $t('Error'),
+                            content: response.message || $t('Failed to check refund status.')
+                        });
+                        $('a[data-payment-id="' + paymentId + '"].refund-status-btn')
+                            .css('opacity', '1')
+                            .text($t('Check Status'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log("AJAX Error:", xhr.responseText);
+                    alert({
+                        title: $t('Error'),
+                        content: $t('An error occurred while checking refund status.')
+                    });
+                    $('a[data-payment-id="' + paymentId + '"].refund-status-btn')
+                        .css('opacity', '1')
+                        .text($t('Check Status'));
+                }
+            });
+        });
+
+        $(document).on('click', '.refund-cancel-btn', function(e) {
+            e.preventDefault();
+            
+            var paymentId = $(this).data('payment-id');
+            var bookeyTrackId = $(this).data('bookeey-track-id');
+            var merchantTrackId = $(this).data('merchant-track-id');
+
+            $('a[data-payment-id="' + paymentId + '"].refund-cancel-btn')
+                .css('opacity', '0.5')
+                .text($t('Canceling...'));
+            $.ajax({
+                url: config.requestRefundUrl,
+                type: 'GET',
+                data: {
+                    payment_id: paymentId,
+                    bookeey_track_id: bookeyTrackId,
+                    merchant_track_id: merchantTrackId,
+                    cancel: true
+                },
+                success: function(response) {
+                    console.log("Response:", response);
+                    if (response.success) {
+                        alert({
+                            title: $t('Success'),
+                            content: $t('Status updated successfully.'),
+                            actions: {
+                                always: function() {
+                                    // Refresh search results
+                                    performSearch();
+                                }
+                            }
+                        });
+                    } else {
+                        alert({
+                            title: $t('Error'),
+                            content: response.message || $t('Failed to cancel.')
+                        });
+                        $('a[data-payment-id="' + paymentId + '"].refund-cancel-btn')
+                            .css('opacity', '1')
+                            .text($t('Cancel Refund'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log("AJAX Error:", xhr.responseText);
+                    alert({
+                        title: $t('Error'),
+                        content: $t('An error occurred while canceling your refund.')
+                    });
+                    $('a[data-payment-id="' + paymentId + '"].refund-cancel-btn')
+                        .css('opacity', '1')
+                        .text($t('Cancel Refund'));
                 }
             });
         });
@@ -239,11 +367,7 @@ define([
         }
 
         function requestRefund(paymentId, bookeyTrackId, merchantTrackId, amount) {
-            console.log("Request: " + config.requestRefundUrl);
-            // document.location.href = config.requestRefundUrl + '?payment_id=' + paymentId + 
-            //     '&bookeey_track_id=' + bookeyTrackId + 
-            //     '&merchant_track_id=' + merchantTrackId + 
-            //     '&amount=' + amount;
+            
             $('a[data-payment-id="' + paymentId + '"].request-refund-btn')
                         .css('opacity', '0.5')
                         .text($t('Requesting...'));

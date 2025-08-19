@@ -27,8 +27,10 @@ class Request extends Action
             $bookeyTrackId = $this->getRequest()->getParam('bookeey_track_id');
             $merchantTrackId = $this->getRequest()->getParam('merchant_track_id');
             $amount = $this->getRequest()->getParam('amount');
+            $checkStatus = $this->getRequest()->getParam('check_status', false);
+            $cancel = $this->getRequest()->getParam('cancel', false);
 
-            if (!$paymentId || !$bookeyTrackId || !$merchantTrackId || !$amount) {
+            if (!$paymentId || !$bookeyTrackId || !$merchantTrackId) {
                 return $result->setData([
                     'success' => false,
                     'message' => __('Missing required parameters for refund request.')
@@ -65,7 +67,13 @@ class Request extends Action
             $bede->baseURL = $helper->getBaseUrl();
 
             // Make refund request
-            $response = $bede->requestRefund($bookeyTrackId, $merchantTrackId, $amount);
+            if ($cancel) {
+                $response = $bede->cancelRefund($bookeyTrackId, $merchantTrackId);
+            } else if ($checkStatus) {
+                $response = $bede->statusRefund($bookeyTrackId, $merchantTrackId);
+            } else {
+                $response = $bede->requestRefund($bookeyTrackId, $merchantTrackId, $amount);
+            }
 
             // Log the request
             $connection = $resourceConnection->getConnection();
@@ -76,7 +84,11 @@ class Request extends Action
 
             if ($jsonResponse && isset($jsonResponse['data']) && $jsonResponse['isSuccess'] === true) {
                 // Update payment record
-                $this->updatePaymentRefundStatus($paymentId, 'Requested', $resourceConnection, $amount, $response, $bede->logData);
+                $status = "Requested";
+                if (isset($jsonResponse['data']['ReqSts'][0]['ReqSts'])) {
+                    $status = $jsonResponse['data']['ReqSts'][0]['ReqSts'];
+                }
+                $this->updatePaymentRefundStatus($paymentId, $status, $resourceConnection, $amount, $response, $bede->logData);
 
                 return $result->setData([
                     'success' => true,

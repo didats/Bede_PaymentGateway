@@ -360,7 +360,7 @@ CURL;
         return $response;
     }
 
-    public function cancelRefund($bookeyTrackID, $merchantTrackID, $amount)
+    public function cancelRefund($bookeyTrackID, $merchantTrackID)
     {
         $path = "/bkycoreapi/v1/Accounts/request-refund";
         $postData = [
@@ -383,11 +383,44 @@ CURL;
                 "MerchRefNo" =>  $merchantTrackID,
                 "RefndTo" =>  "CST",
                 "ProsStatCD" =>  5,
-                "Refnd_AMT" =>  $amount,
+                "Refnd_AMT" =>  null,
                 "Remark" =>  null,
                 "MerUID" =>  $this->merchantID
             ],
             "DBRqst" =>  "ReFnd_Req"
+        ];
+
+        $this->requestData = $postData;
+        $response = $this->exec($path, $postData);
+        return $response;
+    }
+
+    public function statusRefund($bookeyTrackID, $merchantTrackID)
+    {
+        $path = "/bkycoreapi/v1/Accounts/request-refund";
+        $postData = [
+            "Do_Appinfo" =>  [
+                "APPID" =>  "ACNTS",
+                "MdlID" =>  "Refnd",
+                "AppLicens" => "s",
+                'AppTyp' => $this->moduleName,
+                'AppVer' => $this->moduleVersion,
+                'ApiVer' => '0.61',
+                'IPAddrs' => $this->IPAddress(),
+                'Country' => 'Kuwait',
+            ],
+            "Do_UsrAuth" =>  [
+                "AuthTyp" =>  "5",
+                "UsrSessnUID" =>  ""
+            ],
+            "Do_ReFndDtl" =>  [
+                "BkyTrackUID" =>  $bookeyTrackID,
+                "MerchRefNo" =>  $merchantTrackID,
+                "RefndTo" =>  "CST",
+                "ProsStatCD" =>  1,
+                "MerUID" =>  $this->merchantID
+            ],
+            "DBRqst" =>  "ReFnd_Sts"
         ];
 
         $this->requestData = $postData;
