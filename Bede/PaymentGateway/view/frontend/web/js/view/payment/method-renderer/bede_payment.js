@@ -55,6 +55,7 @@ define([
             var result = this._super();
             
             if (!this.availableMethods().length) {
+                document.getElementById("bede-submethod").style.display = ''
                 this.loadPaymentMethods();
             }
             

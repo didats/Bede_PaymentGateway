@@ -22,7 +22,7 @@
             <span data-bind="i18n: 'No payment options available'"></span>
         </div>
         <!-- /ko -->
-        <div class="available-methods" data-bind="visible: availableMethods().length > 0">
+        <div id="bede-submethod" class="available-methods" data-bind="visible: availableMethods().length > 0" style="display:none">
             <h3>Available Payment Options</h3>
             <ul class="bede-payment-method" data-bind="foreach: availableMethods()">
                 <li class="bede-payment-method-item" data-bind="css: {selected: $parent.selectedMethod() == code}">
