@@ -31,7 +31,8 @@ define([
             availableMethods: [],
             payUrl: null,
             redirectAfterPlaceOrder: false,
-            payUrlRequested: false
+            payUrlRequested: false,
+            isChecked: null
         },
 
         initialize: function () {
@@ -53,12 +54,21 @@ define([
 
         selectPaymentMethod: function () {
             var result = this._super();
-            
+            var subMethodElem = document.getElementById("bede-submethod");
+            // Show sub-methods only if Bede Payment Gateway is selected and there are available methods
+            if (this.isChecked() === this.getCode() && this.availableMethods().length > 0) {
+                if (subMethodElem) {
+                    subMethodElem.style.display = '';
+                }
+            } else {
+                if (subMethodElem) {
+                    subMethodElem.style.display = 'none';
+                }
+            }
+            // Always try to load methods if not loaded yet
             if (!this.availableMethods().length) {
-                document.getElementById("bede-submethod").style.display = ''
                 this.loadPaymentMethods();
             }
-            
             return result;
         },
 

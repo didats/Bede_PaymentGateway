@@ -88,6 +88,11 @@ class Request extends Action
                 if (isset($jsonResponse['data']['ReqSts'][0]['ReqSts'])) {
                     $status = $jsonResponse['data']['ReqSts'][0]['ReqSts'];
                 }
+
+                if (isset($jsonResponse['data']['Do_ReFndDtl'][0]['ReFndReqUID'])) {
+                    $status = "Successfully";
+                }
+
                 $this->updatePaymentRefundStatus($paymentId, $status, $resourceConnection, $amount, $response, $bede->logData);
 
                 return $result->setData([
