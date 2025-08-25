@@ -90,7 +90,7 @@ class Request extends Action
                 }
 
                 if (isset($jsonResponse['data']['Do_ReFndDtl'][0]['ReFndReqUID'])) {
-                    $status = "Successfully";
+                    $status = "Success";
                 }
 
                 $this->updatePaymentRefundStatus($paymentId, $status, $resourceConnection, $amount, $response, $bede->logData);
