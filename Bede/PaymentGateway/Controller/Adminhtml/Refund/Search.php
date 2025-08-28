@@ -81,6 +81,13 @@ class Search extends Action
         foreach ($results as $row) {
             $canRefund = $this->canRefundPayment($row);
 
+            $response = $row['refund_response'] ?? "[]";
+            $jsonResponse = json_decode($response, true);
+            if (isset($jsonResponse['data']['Do_ReFndDtl'][0]['ReFndReqUID'])) {
+                $row['refund_status'] = "Success";
+                $canRefund = false;
+            }
+
             $payments[] = [
                 'id' => $row['id'],
                 'cart_id' => $row['cart_id'] ?: 'N/A',

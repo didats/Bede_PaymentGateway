@@ -116,11 +116,12 @@ class Response extends Action
 
                 if ($dataResponse['ErrorCode'] == 0) {
                     $isPaid = true;
-                    $paymentType = $dataResponse['PaymentType'];
-                    $paymentID = $dataResponse['PaymentId'];
-                    $processDate = $dataResponse['ProcessDate'];
-                    $bankReference = $dataResponse['BankRefNo'];
                 }
+
+                $paymentType = $dataResponse['PaymentType'];
+                $paymentID = $dataResponse['PaymentId'];
+                $processDate = $dataResponse['ProcessDate'];
+                $bankReference = $dataResponse['BankRefNo'];
             }
         }
 
