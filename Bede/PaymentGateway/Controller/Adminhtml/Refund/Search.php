@@ -127,8 +127,12 @@ class Search extends Action
             return false;
         }
 
+        if ($paymentData['payment_status'] == 'success') {
+            return true;
+        }
+
         // Additional checks can be added here
-        return true;
+        return false;
     }
 
     protected function _isAllowed()
